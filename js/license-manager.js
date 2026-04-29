@@ -18,7 +18,7 @@ async function initApp() {
     try {
         const { data: school, error } = await _supabase
             .from('schools')
-            .select('name, license_status, salt, activation_token')
+            .select('name, license_status, salt, activation_token, logo_url, theme_color')
             .eq('slug', clientId)
             .single();
 
@@ -26,7 +26,10 @@ async function initApp() {
 
         // Simpan data ke Window agar bisa diakses di index.html
         window.schoolData = school;
-
+        // Jalankan update tampilan branding logo/warna di index.html jika fungsinya ada
+        if (typeof updateBranding === "function") {
+            updateBranding(school);
+        }
         if (school.license_status === 'active') {
             bukaSistem();
         } else {
