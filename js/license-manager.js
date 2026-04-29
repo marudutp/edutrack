@@ -108,8 +108,10 @@ async function prosesAktivasi() {
                 alert("Token benar, tapi gagal lapor ke pusat, Lur! Cek RLS Supabase Sampeyan.");
             } else if (data && data.length > 0) {
                 alert("Berhasil! Sistem telah aktif.");
-                location.reload();
+                // location.reload();
+                bukaSistem();
             } else {
+                location.reload();
                 alert("Gagal: Sekolah tidak ditemukan saat update.");
             }
         } else {
