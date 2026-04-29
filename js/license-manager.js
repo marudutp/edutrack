@@ -52,7 +52,7 @@ function tampilkanTirai(schoolName) {
 
 // --- FUNGSI TOMBOL ---
 function kirimBuktiWA() {
-    const phone = "6281315582319";
+    const phone = "6287809657300";
     const pesan = encodeURIComponent(`Halo Lur, saya dari ${currentSchoolName} ingin kirim bukti transfer aktivasi EduTrack.`);
     window.open(`https://wa.me/${phone}?text=${pesan}`, '_blank');
 }
@@ -85,7 +85,7 @@ async function prosesAktivasi() {
         }
 
         // LANGKAH 2: Buat hash dari (Input User + Salt dari DB)
-        const userHash = await generateSHA256(inputToken, school.salt);
+        const userHash = await generateSHA256(inputToken+school.salt);
 
         // LANGKAH 3: Bandingkan hasil hash tadi dengan yang ada di DB
         if (userHash === school.activation_token) {
