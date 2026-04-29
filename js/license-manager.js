@@ -85,8 +85,14 @@ async function prosesAktivasi() {
         }
 
         // LANGKAH 2: Buat hash dari (Input User + Salt dari DB)
-        const userHash = await generateSHA256(inputToken+school.salt);
-
+        const userHash = await generateSHA256(inputToken + school.salt);
+        // --- TAMBAHKAN INI UNTUK CEK DI CONSOLE (F12) ---
+        console.log("Token Input:", inputToken);
+        console.log("Salt dari DB:", school.salt);
+        console.log("Rumus Gabung:", inputToken + school.salt);
+        console.log("Hasil Hash Browser:", userHash);
+        console.log("Hash di Database   :", school.activation_token);
+        // ------------------------------------------------
         // LANGKAH 3: Bandingkan hasil hash tadi dengan yang ada di DB
         if (userHash === school.activation_token) {
             // Jika cocok, aktifkan!
