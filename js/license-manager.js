@@ -96,14 +96,21 @@ async function prosesAktivasi() {
         // LANGKAH 3: Bandingkan hasil hash tadi dengan yang ada di DB
         if (userHash === school.activation_token) {
             // Jika cocok, aktifkan!
-            const { error: updateError } = await _supabase
+            // ... di dalam prosesAktivasi ...
+            const { data, error: updateError } = await _supabase
                 .from('schools')
-                .update({ license_status: 'active' })
-                .eq('slug', clientId);
+                .update({ license_status: 'active' }) // Pastikan nama kolomnya benar
+                .eq('slug', clientId)
+                .select(); // Tambahkan .select() untuk memastikan data terupdate
 
-            if (!updateError) {
-                alert(`Berhasil! Selamat menggunakan ${school.name}, Lur.`);
+            if (updateError) {
+                console.error("Gagal update DB:", updateError);
+                alert("Token benar, tapi gagal lapor ke pusat, Lur! Cek RLS Supabase Sampeyan.");
+            } else if (data && data.length > 0) {
+                alert("Berhasil! Sistem telah aktif.");
                 location.reload();
+            } else {
+                alert("Gagal: Sekolah tidak ditemukan saat update.");
             }
         } else {
             alert("Token Salah, Lur! Periksa kembali kodenya.");
