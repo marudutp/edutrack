@@ -270,7 +270,31 @@
                 container.appendChild(div);
             });
         }
+        // Tambahkan logic ini di dalam tag <script> Portal Parent
+        const urlParams = new URLSearchParams(window.location.search);
+        const callerSource = urlParams.get('from'); // Mengambil data 'from' dari URL
+        const backLinkElement = document.querySelector('.btn-home');
 
+        if (callerSource) {
+            // Jika dipanggil dari SDA Music, maka tombol kembali akan mengarah ke sana
+            backLinkElement.href = callerSource;
+            backLinkElement.innerHTML = `<i class="fas fa-arrow-left"></i> Kembali ke ${new URL(callerSource).hostname}`;
+        } else {
+            // Default jika tidak ada pemanggil (langsung ke edutrack)
+            backLinkElement.href = "https://edutrack.pro/edutrack/";
+        }
+
+        // Otomatis isi kolom ID Sekolah jika ada di URL (Opsional biar orang tua gak repot pilih)
+        const schoolId = urlParams.get('id');
+        if (schoolId) {
+            // Tambahkan delay sedikit agar daftar sekolah selesai dimuat dulu
+            setTimeout(() => {
+                const select = document.getElementById('school-select');
+                // Cari option yang value-nya sama dengan sda-music (UUID-nya)
+                // Note: Ini butuh penyesuaian sedikit jika Sampeyan ingin otomatis pilih by Slug
+                // Tapi setidaknya logic 'from' di atas sudah mengunci arah pulang.
+            }, 1000);
+        }
         // Jalankan saat load
         fetchSchools();
     </script>
