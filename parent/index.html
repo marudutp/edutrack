@@ -1,121 +1,24 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduTrack Portal Orang Tua</title>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <script src="../js/license-manager.js"></script>
-
     <style>
-        /* CSS Sampeyan tetap di sini agar tampilan tetap cantik */
-        :root {
-            --primary: #4f46e5;
-            --success: #22c55e;
-            --light: #f8fafc;
-            --dark: #1e293b;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--light);
-            color: var(--dark);
-            margin: 0;
-            padding: 20px;
-        }
-
-        .wrapper {
-            max-width: 500px;
-            margin: auto;
-        }
-
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100000;
-        }
-
-        #tirai-pembayaran {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(15px);
-            z-index: 99999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tirai-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .search-card {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-        }
-
-        .log-item {
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            border-left: 5px solid var(--primary);
-            display: none;
-        }
-
-        .nav-top {
-            display: flex;
-            justify-content: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .btn-home {
-            text-decoration: none;
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #main-app {
-            display: none;
-        }
-
-        /* Akan dibuka oleh license-manager.js */
+        :root { --primary: #4f46e5; --success: #22c55e; --light: #f8fafc; --dark: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--dark); margin: 0; padding: 20px; }
+        .wrapper { max-width: 500px; margin: auto; display: none; } /* Default sembunyi */
+        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; align-items: center; justify-content: center; z-index: 100000; }
+        #tirai-pembayaran { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); z-index: 99999; display: none; align-items: center; justify-content: center; }
+        .tirai-content { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 400px; width: 90%; text-align: center; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .search-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
+        .log-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
     </style>
 </head>
-
 <body>
     <div id="loading-screen">Menghubungkan ke Cloud Engine...</div>
 
@@ -123,79 +26,77 @@
         <div class="tirai-content">
             <h2>Masa Aktif Habis, Lur! 🙏</h2>
             <p id="pesan-tirai"></p>
-            <div
-                style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
+            <div style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
                 BCA 5700169644 <br> a/n Marudut Panggabean
-                <button onclick="kirimBuktiWA()"
-                    style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px;">Kirim
-                    Bukti WA</button>
+                <button onclick="window.open('https://wa.me/628123456789')" style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px;">Kirim Bukti WA</button>
             </div>
-            <input type="text" id="input-token" style="width:100%; padding:10px; margin-bottom:10px;"
-                placeholder="Token Aktivasi...">
-            <button onclick="prosesAktivasi()"
-                style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:5px;">Aktifkan</button>
+            <input type="text" id="input-token" style="width:100%; padding:10px; margin-bottom:10px;" placeholder="Token Aktivasi...">
+            <button onclick="prosesAktivasi()" style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:5px;">Aktifkan</button>
         </div>
     </div>
 
     <div class="wrapper" id="main-app">
-        <div class="nav-top">
-            <a href="../" class="btn-home">
+        <div class="nav-top" style="margin-bottom:20px;">
+            <a href="../" class="btn-home" style="text-decoration:none; color:#64748b; font-weight:600;">
                 <i class="fas fa-arrow-left"></i> Kembali ke Home
             </a>
         </div>
-
+        
         <div class="header">
-            <i class="fas fa-user-graduate"></i>
+            <i class="fas fa-user-graduate" style="font-size: 40px; color: var(--primary);"></i>
             <h1>Monitoring Siswa</h1>
             <p>Cek absensi dan jurnal harian anak Anda.</p>
         </div>
 
         <div class="search-card">
             <div class="form-group" style="margin-bottom:20px;">
-                <label style="display:block; margin-bottom:8px; font-weight:600;">Pilih Institusi / Sekolah</label>
-                <select id="school-select"
-                    style="width:100%; padding:12px; border-radius:12px; border:2px solid #e2e8f0;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Pilih Sekolah</label>
+                <select id="school-select" style="width:100%; padding:12px; border-radius:12px; border:2px solid #e2e8f0;">
                     <option value="">-- Pilih Sekolah --</option>
                 </select>
             </div>
             <div class="form-group" style="margin-bottom:20px;">
                 <label style="display:block; margin-bottom:8px; font-weight:600;">Nama Lengkap Siswa</label>
-                <input type="text" id="student-name" placeholder="Masukkan nama anak..."
-                    style="width:100%; padding:12px; border-radius:12px; border:2px solid #e2e8f0;">
+                <input type="text" id="student-name" placeholder="Masukkan nama anak..." style="width:100%; padding:12px; border-radius:12px; border:2px solid #e2e8f0;">
             </div>
-            <button class="btn-search" onclick="searchLogs()"
-                style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">
+            <button onclick="searchLogs()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">
                 Lihat Kehadiran <i class="fas fa-search"></i>
             </button>
         </div>
-
         <div id="results-container"></div>
-        <div id="no-data" style="display:none; text-align:center; color:#94a3b8; padding:40px;">Data tidak ditemukan.
-        </div>
+        <div id="no-data" style="display:none; text-align:center; color:#94a3b8; padding:40px;">Data tidak ditemukan.</div>
     </div>
 
     <script>
-        // JALANKAN SATPAM PUSAT
-        initApp(); // Fungsi ini otomatis mengatur loading & tirai berdasarkan license-manager.js
+        // Jalankan Inisialisasi
+        initApp();
 
-        // LOGIKA KHUSUS PORTAL ORANG TUA
-        fetchSchools
-        // Ambil parameter 'from' dari URL
+        // Navigasi Dinamis (Back Button)
         const callerSource = urlParams.get('from');
         const backBtn = document.querySelector('.btn-home');
-
         if (backBtn && callerSource) {
-            // Ubah link tujuan sesuai parameter 'from'
             backBtn.href = callerSource;
-
-            // Opsional: Ubah teksnya biar lebih keren (misal: Kembali ke sda-music.com)
             try {
                 const domain = new URL(callerSource).hostname;
                 backBtn.innerHTML = `<i class="fas fa-arrow-left"></i> Kembali ke ${domain}`;
-            } catch (e) {
-                backBtn.innerHTML = `<i class="fas fa-arrow-left"></i> Kembali`;
-            }
+            } catch(e) {}
         }
+
+        async function fetchSchools() {
+            try {
+                const { data, error } = await _supabase.from('schools').select('id, name').order('name');
+                if (data) {
+                    const select = document.getElementById('school-select');
+                    data.forEach(s => {
+                        let opt = document.createElement('option');
+                        opt.value = s.id;
+                        opt.innerHTML = s.name;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) { console.error(e); }
+        }
+
         async function searchLogs() {
             const schoolId = document.getElementById('school-select').value;
             const studentName = document.getElementById('student-name').value.trim();
@@ -203,16 +104,11 @@
             const emptyMsg = document.getElementById('no-data');
 
             if (!schoolId || !studentName) return alert("Isi data dulu, Lur!");
-
             container.innerHTML = "Memuat data...";
             emptyMsg.style.display = 'none';
 
-            const { data: logs } = await _supabase
-                .from('attendance_logs')
-                .select('*')
-                .eq('school_id', schoolId)
-                .ilike('student_info', `%${studentName}%`)
-                .order('created_at', { ascending: false });
+            const { data: logs } = await _supabase.from('attendance_logs').select('*')
+                .eq('school_id', schoolId).ilike('student_info', `%${studentName}%`).order('created_at', { ascending: false });
 
             container.innerHTML = "";
             if (!logs || logs.length === 0) { emptyMsg.style.display = 'block'; return; }
@@ -220,10 +116,7 @@
             logs.forEach(log => {
                 const div = document.createElement('div');
                 div.className = 'log-item';
-                div.style.display = 'block';
-                const time = new Date(log.created_at).toLocaleString('id-ID', {
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
+                const time = new Date(log.created_at).toLocaleString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 div.innerHTML = `
                     <div style="font-size:12px; color:#94a3b8; margin-bottom:5px;"><i class="far fa-calendar-alt"></i> ${time}</div>
                     <div style="font-weight:bold;">${log.student_info}</div>
@@ -236,5 +129,4 @@
         fetchSchools();
     </script>
 </body>
-
 </html>

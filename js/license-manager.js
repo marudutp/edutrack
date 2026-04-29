@@ -1,22 +1,17 @@
-
-// 1. Definisikan variabel di paling ATAS
+// 1. Inisialisasi Variabel Global
 const urlParams = new URLSearchParams(window.location.search);
 const clientId = urlParams.get('id');
 
-// --- CONFIGURATION & GLOBAL VARS ---
 const SUPABASE_URL = 'https://fcjmcqwlaauuoheggjpp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjam1jcXdsYWF1dW9oZWdnanBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDU3OTQsImV4cCI6MjA5Mjk4MTc5NH0.SbisuJx1bfWUxcMhoqyLjpECPqtZHeRaPa6vAePGIdY';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 2. Fungsi Utama Satpam
+// 2. Fungsi Utama Inisialisasi
 async function initApp() {
     const loader = document.getElementById('loading-screen');
-    const tirai = document.getElementById('tirai-pembayaran');
-    const mainApp = document.getElementById('main-app');
-
     if (!clientId) {
         if (loader) loader.style.display = 'none';
-        alert("ID Sekolah tidak ditemukan di URL, Lur!");
+        alert("ID Sekolah tidak ditemukan, Lur!");
         return;
     }
 
@@ -29,9 +24,8 @@ async function initApp() {
 
         if (error || !school) throw new Error("Sekolah tidak terdaftar.");
 
-        // Simpan nama sekolah ke global biar bisa dipakai di index.html
-        window.currentSchoolName = school.name;
-        window.schoolData = school; // Simpan data salt & token untuk aktivasi
+        // Simpan data ke Window agar bisa diakses di index.html
+        window.schoolData = school;
 
         if (school.license_status === 'active') {
             bukaSistem();
@@ -39,33 +33,31 @@ async function initApp() {
             tampilkanTirai(school.name);
         }
     } catch (err) {
-        if (loader) loader.style.display = 'none';
         console.error("Auth Error:", err);
+        if (loader) loader.style.display = 'none';
     }
 }
 
 function bukaSistem() {
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('tirai-pembayaran').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
+    if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
+    if (document.getElementById('tirai-pembayaran')) document.getElementById('tirai-pembayaran').style.display = 'none';
+    if (document.getElementById('main-app')) document.getElementById('main-app').style.display = 'block';
 }
 
 function tampilkanTirai(name) {
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('tirai-pembayaran').style.display = 'flex';
-    document.getElementById('pesan-tirai').innerText = `Masa aktif untuk ${name} telah habis.`;
+    if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
+    if (document.getElementById('tirai-pembayaran')) document.getElementById('tirai-pembayaran').style.display = 'flex';
+    if (document.getElementById('pesan-tirai')) document.getElementById('pesan-tirai').innerText = `Masa aktif untuk ${name} telah habis.`;
 }
 
-// 3. FUNGSI AKTIVASI (Yang Sampeyan tanyakan tadi)
+// 3. Fungsi Aktivasi
 async function prosesAktivasi() {
     const tokenInput = document.getElementById('input-token').value;
     if (!tokenInput) return alert("Isi tokennya, Lur!");
 
-    // Gunakan data school yang sudah kita simpan di window.schoolData saat initApp tadi
     const salt = window.schoolData.salt;
     const targetHash = window.schoolData.activation_token;
 
-    // Buat hash dari (Input + Salt)
     const userHash = await generateSHA256(tokenInput + salt);
 
     if (userHash === targetHash) {
@@ -76,7 +68,7 @@ async function prosesAktivasi() {
 
         if (!error) {
             alert("Aktivasi Berhasil!");
-            bukaSistem(); // <--- INI KUNCINYA! Langsung buka tanpa refresh
+            bukaSistem();
         }
     } else {
         alert("Token Salah, Lur!");
