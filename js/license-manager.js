@@ -57,6 +57,14 @@ function kirimBuktiWA() {
     window.open(`https://wa.me/${phone}?text=${pesan}`, '_blank');
 }
 
+// Fungsi untuk merubah teks biasa jadi SHA-256
+async function generateSHA256(message) {
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function prosesAktivasi() {
     const inputToken = document.getElementById('input-token').value;
     const clientId = urlParams.get('id');
@@ -64,44 +72,35 @@ async function prosesAktivasi() {
     if (!inputToken) return alert("Isi tokennya dulu, Lur!");
 
     try {
-        // --- PROSES PENTING ---
-        // Ubah input teks user menjadi SHA-256 dulu
+        // 1. Ubah input user jadi hash SHA-256
         const hashedInput = await generateSHA256(inputToken);
 
-        // Cari di Supabase yang hash-nya cocok dengan input tadi
+        // 2. Cek ke Supabase: bandingkan HASH di DB vs HASH dari input user
         const { data: school, error } = await _supabase
             .from('schools')
-            .select('id, name')
+            .select('id')
             .eq('slug', clientId)
-            .eq('activation_token', hashedInput) // Membandingkan HASH vs HASH
+            .eq('activation_token', hashedInput)
             .single();
 
         if (error || !school) {
-            alert("Token Salah, Lur! Kode ini tidak cocok dengan sistem kami.");
+            alert("Token Salah, Lur! Periksa kembali kode aktivasi Sampeyan.");
             return;
         }
 
-        // Jika cocok, update status lisensi
+        // 3. Jika cocok, ubah status jadi 'active'
         const { error: updateError } = await _supabase
             .from('schools')
             .update({ license_status: 'active' })
             .eq('id', school.id);
 
         if (!updateError) {
-            alert(`Mantap! Sistem untuk ${school.name} sekarang aktif.`);
+            alert("Sistem Berhasil Diaktifkan! Membuka gembok...");
             location.reload();
         }
 
     } catch (err) {
         console.error("Gagal Aktivasi:", err);
-        alert("Terjadi gangguan koneksi, Lur.");
+        alert("Terjadi kesalahan teknis, Lur.");
     }
-}
-// Fungsi pembantu untuk mengubah teks menjadi SHA-256 hex string
-async function generateSHA256(message) {
-    const msgUint8 = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
 }
