@@ -84,18 +84,7 @@
         initApp(); // Fungsi ini otomatis mengatur loading & tirai berdasarkan license-manager.js
 
         // LOGIKA KHUSUS PORTAL ORANG TUA
-        async function fetchSchools() {
-            const { data } = await _supabase.from('schools').select('id, name').order('name');
-            if (data) {
-                const select = document.getElementById('school-select');
-                data.forEach(s => {
-                    let opt = document.createElement('option');
-                    opt.value = s.id;
-                    opt.innerHTML = s.name;
-                    select.appendChild(opt);
-                });
-            }
-        }
+        fetchSchools
 
         async function searchLogs() {
             const schoolId = document.getElementById('school-select').value;
