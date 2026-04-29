@@ -72,35 +72,39 @@ async function prosesAktivasi() {
     if (!inputToken) return alert("Isi tokennya dulu, Lur!");
 
     try {
-        // 1. Ubah input user jadi hash SHA-256
-        const hashedInput = await generateSHA256(inputToken);
-
-        // 2. Cek ke Supabase: bandingkan HASH di DB vs HASH dari input user
-        const { data: school, error } = await _supabase
+        // LANKAH 1: Ambil SALT dan HASH target dari database untuk sekolah ini
+        const { data: school, error: fetchError } = await _supabase
             .from('schools')
-            .select('id')
+            .select('salt, activation_token, name')
             .eq('slug', clientId)
-            .eq('activation_token', hashedInput)
             .single();
 
-        if (error || !school) {
-            alert("Token Salah, Lur! Periksa kembali kode aktivasi Sampeyan.");
+        if (fetchError || !school) {
+            alert("Sekolah tidak ditemukan, Lur!");
             return;
         }
 
-        // 3. Jika cocok, ubah status jadi 'active'
-        const { error: updateError } = await _supabase
-            .from('schools')
-            .update({ license_status: 'active' })
-            .eq('id', school.id);
+        // LANGKAH 2: Buat hash dari (Input User + Salt dari DB)
+        const userHash = await generateSHA256(inputToken, school.salt);
 
-        if (!updateError) {
-            alert("Sistem Berhasil Diaktifkan! Membuka gembok...");
-            location.reload();
+        // LANGKAH 3: Bandingkan hasil hash tadi dengan yang ada di DB
+        if (userHash === school.activation_token) {
+            // Jika cocok, aktifkan!
+            const { error: updateError } = await _supabase
+                .from('schools')
+                .update({ license_status: 'active' })
+                .eq('slug', clientId);
+
+            if (!updateError) {
+                alert(`Berhasil! Selamat menggunakan ${school.name}, Lur.`);
+                location.reload();
+            }
+        } else {
+            alert("Token Salah, Lur! Periksa kembali kodenya.");
         }
 
     } catch (err) {
-        console.error("Gagal Aktivasi:", err);
-        alert("Terjadi kesalahan teknis, Lur.");
+        console.error("Aktivasi Gagal:", err);
+        alert("Terjadi gangguan jaringan.");
     }
 }
