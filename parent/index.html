@@ -9,188 +9,50 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <script src="../js/license-manager.js"></script>
+
     <style>
-        :root {
-            --primary: #4f46e5;
-            --success: #22c55e;
-            --light: #f8fafc;
-            --dark: #1e293b;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--light);
-            color: var(--dark);
-            margin: 0;
-            padding: 20px;
-        }
-
-        .wrapper {
-            max-width: 500px;
-            margin: auto;
-        }
-
-        /* Header Style */
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header i {
-            font-size: 40px;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            margin: 0;
-            color: var(--dark);
-        }
-
-        .header p {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        /* Search Form */
-        .search-card {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        select,
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        select:focus,
-        input:focus {
-            border-color: var(--primary);
-        }
-
-        .btn-search {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-search:hover {
-            background: #4338ca;
-        }
-
-        /* Results Area */
-        .log-item {
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            border-left: 5px solid var(--primary);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-            display: none;
-        }
-
-        .log-time {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 5px;
-        }
-
-        .log-note {
-            background: #f1f5f9;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-top: 10px;
-            border: 1px dashed #cbd5e1;
-        }
-
-        #no-data {
-            display: none;
-            text-align: center;
-            color: #94a3b8;
-            padding: 40px;
-        }
-
-        .nav-top {
-            display: flex;
-            justify-content: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .btn-home {
-            text-decoration: none;
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-        }
-
-        .btn-home:hover {
-            color: var(--primary);
-        }
+        /* CSS Sampeyan tetap di sini agar tampilan tetap cantik */
+        :root { --primary: #4f46e5; --success: #22c55e; --light: #f8fafc; --dark: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--dark); margin: 0; padding: 20px; }
+        .wrapper { max-width: 500px; margin: auto; }
+        
+        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; align-items: center; justify-content: center; z-index: 100000; }
+        #tirai-pembayaran { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); z-index: 99999; display: none; align-items: center; justify-content: center; }
+        .tirai-content { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 400px; width: 90%; text-align: center; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .search-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
+        .log-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary); display: none; }
+        .nav-top { display: flex; justify-content: flex-start; margin-bottom: 20px; }
+        .btn-home { text-decoration: none; color: #64748b; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        #main-app { display: none; } /* Akan dibuka oleh license-manager.js */
     </style>
 </head>
 
 <body>
+    <div id="loading-screen">Menghubungkan ke Cloud Engine...</div>
+
     <div id="tirai-pembayaran">
         <div class="tirai-content">
             <h2>Masa Aktif Habis, Lur! 🙏</h2>
             <p id="pesan-tirai"></p>
-            <div
-                style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
+            <div style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
                 BCA 5700169644 <br> a/n Marudut Panggabean
-                <button onclick="kirimBuktiWA()"
-                    style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Kirim
-                    Bukti WA</button>
+                <button onclick="kirimBuktiWA()" style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px;">Kirim Bukti WA</button>
             </div>
-            <input type="text" id="input-token" style="width:100%; padding:10px; margin-bottom:10px;"
-                placeholder="Masukkan Token Aktivasi...">
-            <button onclick="prosesAktivasi()"
-                style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:5px;">Aktifkan</button>
+            <input type="text" id="input-token" style="width:100%; padding:10px; margin-bottom:10px;" placeholder="Token Aktivasi...">
+            <button onclick="prosesAktivasi()" style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:5px;">Aktifkan</button>
         </div>
     </div>
-    <div class="wrapper">
+
+    <div class="wrapper" id="main-app">
         <div class="nav-top">
             <a href="../" class="btn-home">
                 <i class="fas fa-arrow-left"></i> Kembali ke Home
             </a>
         </div>
+        
         <div class="header">
             <i class="fas fa-user-graduate"></i>
             <h1>Monitoring Siswa</h1>
@@ -198,80 +60,32 @@
         </div>
 
         <div class="search-card">
-            <div class="form-group">
-                <label>Pilih Institusi / Sekolah</label>
-                <select id="school-select">
+            <div class="form-group" style="margin-bottom:20px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Pilih Institusi / Sekolah</label>
+                <select id="school-select" style="width:100%; padding:12px; border-radius:12px; border:2px solid #e2e8f0;">
                     <option value="">-- Pilih Sekolah --</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Nama Lengkap Siswa</label>
-                <input type="text" id="student-name" placeholder="Masukkan nama anak...">
+            <div class="form-group" style="margin-bottom:20px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Nama Lengkap Siswa</label>
+                <input type="text" id="student-name" placeholder="Masukkan nama anak..." style="width:100%; padding:12px; border-radius:12px; border:2px solid #e2e8f0;">
             </div>
-            <button class="btn-search" onclick="searchLogs()">
+            <button class="btn-search" onclick="searchLogs()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">
                 Lihat Kehadiran <i class="fas fa-search"></i>
             </button>
         </div>
 
         <div id="results-container"></div>
-        <div id="no-data">Data tidak ditemukan. Pastikan nama sesuai dengan Kartu ID.</div>
+        <div id="no-data" style="display:none; text-align:center; color:#94a3b8; padding:40px;">Data tidak ditemukan.</div>
     </div>
 
     <script>
-        let currentSchoolName = "Sekolah Kami"; // Default jika data belum termuat
-        // KONFIGURASI SUPABASE (Gunakan Key yang sama dengan Engine)
-        const SUPABASE_URL = 'https://fcjmcqwlaauuoheggjpp.supabase.co';
+        // JALANKAN SATPAM PUSAT
+        initApp(); // Fungsi ini otomatis mengatur loading & tirai berdasarkan license-manager.js
 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjam1jcXdsYWF1dW9oZWdnanBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDU3OTQsImV4cCI6MjA5Mjk4MTc5NH0.SbisuJx1bfWUxcMhoqyLjpECPqtZHeRaPa6vAePGIdY';
-
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        async function initApp() {
-            const clientId = urlParams.get('id'); // Ambil slug dari URL (?id=sda-music)
-
-            if (!clientId) {
-                alert("ID Sekolah tidak ditemukan, Lur!");
-                return;
-            }
-
-            try {
-                // Ambil data sekolah langsung dari Supabase
-                const { data: school, error } = await _supabase
-                    .from('schools')
-                    .select('name, license_status')
-                    .eq('slug', clientId)
-                    .single();
-
-                if (error || !school) throw new Error("Sekolah tidak terdaftar");
-
-                // CEK STATUS LISENSI
-                if (school.license_status === 'active') {
-                    // JIKA AKTIF: Langsung buka aplikasi
-                    document.getElementById('loading-screen').style.display = 'none';
-                    document.getElementById('tirai-pembayaran').style.display = 'none';
-                    console.log(`Selamat Datang di ${school.name}`);
-                    bukaSistem();
-                } else {
-                    // JIKA TRIAL/EXPIRED: Panggil fungsi tampilkanTirai dengan nama sekolah
-                    tampilkanTirai(school.name);
-                }
-
-            } catch (err) {
-                console.error("Error:", err);
-                document.getElementById('pesan-tirai').innerText = "Data Sekolah Tidak Ditemukan.";
-                document.getElementById('tirai-pembayaran').style.display = 'flex';
-            }
-        }
-
-        // Jalankan saat halaman siap
-        initApp();
-        // 1. Ambil daftar sekolah untuk Combobox
+        // LOGIKA KHUSUS PORTAL ORANG TUA
         async function fetchSchools() {
-            const { data, error } = await _supabase
-                .from('schools')
-                .select('id, name')
-                .order('name');
-
+            const { data } = await _supabase.from('schools').select('id, name').order('name');
             if (data) {
                 const select = document.getElementById('school-select');
                 data.forEach(s => {
@@ -283,121 +97,44 @@
             }
         }
 
-        // 2. Pencarian Logs
         async function searchLogs() {
             const schoolId = document.getElementById('school-select').value;
             const studentName = document.getElementById('student-name').value.trim();
             const container = document.getElementById('results-container');
             const emptyMsg = document.getElementById('no-data');
 
-            if (!schoolId || !studentName) return alert("Pilih sekolah dan masukkan nama anak, Lur!");
+            if (!schoolId || !studentName) return alert("Isi data dulu, Lur!");
 
             container.innerHTML = "Memuat data...";
             emptyMsg.style.display = 'none';
 
-            const { data: logs, error } = await _supabase
+            const { data: logs } = await _supabase
                 .from('attendance_logs')
                 .select('*')
                 .eq('school_id', schoolId)
-                .ilike('student_info', `%${studentName}%`) // Pencarian fleksibel
+                .ilike('student_info', `%${studentName}%`)
                 .order('created_at', { ascending: false });
 
             container.innerHTML = "";
-
-            if (error || !logs || logs.length === 0) {
-                emptyMsg.style.display = 'block';
-                return;
-            }
+            if (!logs || logs.length === 0) { emptyMsg.style.display = 'block'; return; }
 
             logs.forEach(log => {
                 const div = document.createElement('div');
                 div.className = 'log-item';
                 div.style.display = 'block';
-
                 const time = new Date(log.created_at).toLocaleString('id-ID', {
                     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
-
                 div.innerHTML = `
-                <div class="log-time"><i class="far fa-calendar-alt"></i> ${time}</div>
-                <div style="font-weight:bold; color:var(--dark);">${log.student_info}</div>
-                ${log.note ? `<div class="log-note"><strong>Jurnal:</strong> ${log.note}</div>` : ''}
-            `;
+                    <div style="font-size:12px; color:#94a3b8; margin-bottom:5px;"><i class="far fa-calendar-alt"></i> ${time}</div>
+                    <div style="font-weight:bold;">${log.student_info}</div>
+                    ${log.note ? `<div style="background:#f1f5f9; padding:10px; border-radius:8px; font-size:14px; margin-top:10px;"><strong>Jurnal:</strong> ${log.note}</div>` : ''}
+                `;
                 container.appendChild(div);
             });
         }
-        // Tambahkan logic ini di dalam tag <script> Portal Parent
-        const urlParams = new URLSearchParams(window.location.search);
-        const callerSource = urlParams.get('from'); // Mengambil data 'from' dari URL
-        const backLinkElement = document.querySelector('.btn-home');
 
-        if (callerSource) {
-            // Jika dipanggil dari SDA Music, maka tombol kembali akan mengarah ke sana
-            backLinkElement.href = callerSource;
-            backLinkElement.innerHTML = `<i class="fas fa-arrow-left"></i> Kembali ke ${new URL(callerSource).hostname}`;
-        } else {
-            // Default jika tidak ada pemanggil (langsung ke edutrack)
-            backLinkElement.href = "https://edutrack.pro/edutrack/";
-        }
-
-        // Otomatis isi kolom ID Sekolah jika ada di URL (Opsional biar orang tua gak repot pilih)
-        const schoolId = urlParams.get('id');
-        if (schoolId) {
-            // Tambahkan delay sedikit agar daftar sekolah selesai dimuat dulu
-            setTimeout(() => {
-                const select = document.getElementById('school-select');
-                // Cari option yang value-nya sama dengan sda-music (UUID-nya)
-                // Note: Ini butuh penyesuaian sedikit jika Sampeyan ingin otomatis pilih by Slug
-                // Tapi setidaknya logic 'from' di atas sudah mengunci arah pulang.
-            }, 1000);
-        }
-
-        function bukaSistem() {
-            if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
-            if (document.getElementById('tirai-pembayaran')) document.getElementById('tirai-pembayaran').style.display = 'none';
-            const mainApp = document.getElementById('main-app');
-            if (mainApp) mainApp.style.filter = 'none';
-        }
-        function kirimBuktiWA() {
-            const phone = "6287809657300"; // Nomor Sampeyan
-
-            // Menggunakan currentSchoolName yang sudah dinamis dari Supabase
-            const pesan = encodeURIComponent(`Halo Lur, saya dari ${currentSchoolName} ingin kirim bukti transfer aktivasi EduTrack.`);
-
-            window.open(`https://wa.me/${phone}?text=${pesan}`, '_blank');
-        }
-        async function prosesAktivasi() {
-            const inputToken = document.getElementById('input-token').value;
-            const clientId = urlParams.get('id');
-
-            // Asumsi fungsi validateToken sudah ada di file ini atau file utility lain
-            if (await validateToken(inputToken, "HASH_SAMPYEAN")) {
-                const { error } = await _supabase
-                    .from('schools')
-                    .update({ license_status: 'active' })
-                    .eq('slug', clientId);
-
-                if (!error) {
-                    alert("Berhasil! Membuka sistem...");
-                    location.reload();
-                }
-            } else {
-                alert("Token Salah, Lur!");
-            }
-        }
-        function tampilkanTirai(schoolName) {
-            if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
-            const pesanTirai = document.getElementById('pesan-tirai');
-            if (pesanTirai) pesanTirai.innerText = `Saudara ${schoolName}, masa freemium Anda sudah habis.`;
-
-            document.getElementById('tirai-pembayaran').style.display = 'flex';
-            const mainApp = document.getElementById('main-app');
-            if (mainApp) mainApp.style.filter = 'blur(10px)';
-        }
-        // Jalankan saat load
         fetchSchools();
     </script>
-
 </body>
-
 </html>

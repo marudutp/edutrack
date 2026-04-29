@@ -1,6 +1,7 @@
 // --- CONFIGURATION & GLOBAL VARS ---
 const SUPABASE_URL = 'https://fcjmcqwlaauuoheggjpp.supabase.co';
-const SUPABASE_KEY = 'YOUR_ANON_KEY'; // Ganti dengan key Sampeyan
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjam1jcXdsYWF1dW9oZWdnanBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDU3OTQsImV4cCI6MjA5Mjk4MTc5NH0.SbisuJx1bfWUxcMhoqyLjpECPqtZHeRaPa6vAePGIdY';
+       
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const urlParams = new URLSearchParams(window.location.search);
