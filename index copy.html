@@ -23,9 +23,12 @@
         /* Video Mockup Styling */
         .mockup-container { position: relative; display: flex; justify-content: center; }
         .mockup-video { 
-            width: 100%; max-width: 320px; border-radius: 30px;
+            width: 100%;
+            max-width: 320px;
+            border-radius: 30px;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
-            border: 8px solid #334155; background: #000;
+            border: 8px solid #334155;
+            background: #000;
         }
 
         /* Form Section */
@@ -41,14 +44,6 @@
             transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .btn-cta:hover { background: #0056b3; transform: translateY(-2px); }
-
-        /* Footer Link Khusus Orang Tua */
-        .parent-link {
-            display: inline-block; margin-top: 15px; color: var(--primary);
-            text-decoration: none; font-weight: 600; font-size: 14px;
-            transition: 0.3s; border-bottom: 1px solid transparent;
-        }
-        .parent-link:hover { border-bottom: 1px solid var(--primary); }
 
         /* Success State */
         #success-msg { display: none; text-align: center; }
@@ -105,6 +100,7 @@
                 <div class="form-group">
                     <label>Upload Logo (Opsional)</label>
                     <input type="file" id="logo-file" accept="image/*" style="padding:10px;">
+                    <small style="color:#94a3b8; font-size:11px;">*Kami akan menggunakan logo ini untuk branding aplikasi Anda.</small>
                 </div>
                 <button type="submit" class="btn-cta">
                     Siapkan Aplikasi Saya <i class="fas fa-rocket"></i>
@@ -113,44 +109,44 @@
         </div>
 
         <div id="success-msg">
-            <i class="fas fa-circle-check check-icon" style="color:#22c55e"></i>
+            <i class="fas fa-circle-check check-icon"></i>
             <h2>Terima Kasih, Lur!</h2>
             <p>Data institusi <strong><span id="res-nama">-</span></strong> sudah kami terima.</p>
             <p style="background:#f0fdf4; padding:15px; border-radius:12px; color:#166534;">
-                Link akses akan dikirimkan ke WhatsApp Anda dalam <strong>5 menit</strong>.
+                <strong>Tim Tech kami (Lur Marudut)</strong> sedang meramu engine EduTrack Anda. Link akses akan dikirimkan ke WhatsApp Anda dalam <strong>5 menit</strong>.
             </p>
             <button onclick="window.location.reload()" class="btn-cta" style="background:#64748b; margin-top:20px;">Kembali</button>
         </div>
     </div>
 </section>
 
-<footer style="padding:60px 20px; text-align:center; background:#fff; border-top:1px solid #e2e8f0;">
-    <div style="max-width:1200px; margin:auto;">
-        <div class="logo" style="margin-bottom:10px;">EduTrack.pro</div>
-        <p style="color:#94a3b8; font-size:14px; margin:0;">&copy; 2026 EduTrack.pro by Voxelcubes Studios.</p>
-        
-        <div style="margin-top:20px; padding:15px; border-top:1px solid #f1f5f9;">
-            <a href="/parent/" class="parent-link">
-                <i class="fas fa-user-shield"></i> Sudah jadi murid? Pantau kehadiran anak di sini.
-            </a>
-        </div>
-    </div>
+<footer style="padding:40px; text-align:center; color:#94a3b8; font-size:14px;">
+    &copy; 2026 EduTrack.pro by Voxelcubes Studios. Built with ❤️ for Educators.
 </footer>
 
 <script>
     document.getElementById('claim-form').addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const nama = document.getElementById('nama-sekolah').value;
         const wa = document.getElementById('wa-user').value;
-        const phoneAdmin = "6281315582319"; 
+        const phoneAdmin = "628xxxxxxxxxx"; // GANTI DENGAN NOMOR WA SAMPEYAN
         
-        const text = encodeURIComponent(`*PENDAFTARAN EDUTRACK BARU*\nInstitusi: ${nama}\nWA: ${wa}`);
+        const text = encodeURIComponent(
+            `*PENDAFTARAN EDUTRACK.PRO BARU*\n\n` +
+            `Nama Institusi: ${nama}\n` +
+            `No. WA User: ${wa}\n` +
+            `Status: Request Freemium\n\n` +
+            `_Mohon segera siapkan folder /clients/${nama.toLowerCase().replace(/\s+/g, '-')} dan konfigurasinya._`
+        );
         
         document.getElementById('res-nama').innerText = nama;
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('success-msg').style.display = 'block';
 
-        setTimeout(() => { window.open(`https://wa.me/${phoneAdmin}?text=${text}`, '_blank'); }, 2000);
+        setTimeout(() => {
+            window.open(`https://wa.me/${phoneAdmin}?text=${text}`, '_blank');
+        }, 2000);
     });
 </script>
 
