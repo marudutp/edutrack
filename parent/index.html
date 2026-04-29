@@ -168,7 +168,23 @@
 </head>
 
 <body>
-
+    <div id="tirai-pembayaran">
+        <div class="tirai-content">
+            <h2>Masa Aktif Habis, Lur! 🙏</h2>
+            <p id="pesan-tirai"></p>
+            <div
+                style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
+                BCA 5700169644 <br> a/n Marudut Panggabean
+                <button onclick="kirimBuktiWA()"
+                    style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Kirim
+                    Bukti WA</button>
+            </div>
+            <input type="text" id="input-token" style="width:100%; padding:10px; margin-bottom:10px;"
+                placeholder="Masukkan Token Aktivasi...">
+            <button onclick="prosesAktivasi()"
+                style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:5px;">Aktifkan</button>
+        </div>
+    </div>
     <div class="wrapper">
         <div class="nav-top">
             <a href="../" class="btn-home">
@@ -202,6 +218,7 @@
     </div>
 
     <script>
+        let currentSchoolName = "Sekolah Kami"; // Default jika data belum termuat
         // KONFIGURASI SUPABASE (Gunakan Key yang sama dengan Engine)
         const SUPABASE_URL = 'https://fcjmcqwlaauuoheggjpp.supabase.co';
 
@@ -209,6 +226,45 @@
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        async function initApp() {
+            const clientId = urlParams.get('id'); // Ambil slug dari URL (?id=sda-music)
+
+            if (!clientId) {
+                alert("ID Sekolah tidak ditemukan, Lur!");
+                return;
+            }
+
+            try {
+                // Ambil data sekolah langsung dari Supabase
+                const { data: school, error } = await _supabase
+                    .from('schools')
+                    .select('name, license_status')
+                    .eq('slug', clientId)
+                    .single();
+
+                if (error || !school) throw new Error("Sekolah tidak terdaftar");
+
+                // CEK STATUS LISENSI
+                if (school.license_status === 'active') {
+                    // JIKA AKTIF: Langsung buka aplikasi
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('tirai-pembayaran').style.display = 'none';
+                    console.log(`Selamat Datang di ${school.name}`);
+                    bukaSistem();
+                } else {
+                    // JIKA TRIAL/EXPIRED: Panggil fungsi tampilkanTirai dengan nama sekolah
+                    tampilkanTirai(school.name);
+                }
+
+            } catch (err) {
+                console.error("Error:", err);
+                document.getElementById('pesan-tirai').innerText = "Data Sekolah Tidak Ditemukan.";
+                document.getElementById('tirai-pembayaran').style.display = 'flex';
+            }
+        }
+
+        // Jalankan saat halaman siap
+        initApp();
         // 1. Ambil daftar sekolah untuk Combobox
         async function fetchSchools() {
             const { data, error } = await _supabase
@@ -294,6 +350,49 @@
                 // Note: Ini butuh penyesuaian sedikit jika Sampeyan ingin otomatis pilih by Slug
                 // Tapi setidaknya logic 'from' di atas sudah mengunci arah pulang.
             }, 1000);
+        }
+
+        function bukaSistem() {
+            if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
+            if (document.getElementById('tirai-pembayaran')) document.getElementById('tirai-pembayaran').style.display = 'none';
+            const mainApp = document.getElementById('main-app');
+            if (mainApp) mainApp.style.filter = 'none';
+        }
+        function kirimBuktiWA() {
+            const phone = "6287809657300"; // Nomor Sampeyan
+
+            // Menggunakan currentSchoolName yang sudah dinamis dari Supabase
+            const pesan = encodeURIComponent(`Halo Lur, saya dari ${currentSchoolName} ingin kirim bukti transfer aktivasi EduTrack.`);
+
+            window.open(`https://wa.me/${phone}?text=${pesan}`, '_blank');
+        }
+        async function prosesAktivasi() {
+            const inputToken = document.getElementById('input-token').value;
+            const clientId = urlParams.get('id');
+
+            // Asumsi fungsi validateToken sudah ada di file ini atau file utility lain
+            if (await validateToken(inputToken, "HASH_SAMPYEAN")) {
+                const { error } = await _supabase
+                    .from('schools')
+                    .update({ license_status: 'active' })
+                    .eq('slug', clientId);
+
+                if (!error) {
+                    alert("Berhasil! Membuka sistem...");
+                    location.reload();
+                }
+            } else {
+                alert("Token Salah, Lur!");
+            }
+        }
+        function tampilkanTirai(schoolName) {
+            if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
+            const pesanTirai = document.getElementById('pesan-tirai');
+            if (pesanTirai) pesanTirai.innerText = `Saudara ${schoolName}, masa freemium Anda sudah habis.`;
+
+            document.getElementById('tirai-pembayaran').style.display = 'flex';
+            const mainApp = document.getElementById('main-app');
+            if (mainApp) mainApp.style.filter = 'blur(10px)';
         }
         // Jalankan saat load
         fetchSchools();

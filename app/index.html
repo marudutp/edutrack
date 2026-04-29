@@ -132,8 +132,6 @@
             /* Pastikan ambil lebar penuh kartu */
             box-sizing: border-box;
         }
-
-        
     </style>
 </head>
 
@@ -147,7 +145,7 @@
             <p id="pesan-tirai"></p>
             <div
                 style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
-                BCA 5700169644  <br> a/n Marudut Panggabean
+                BCA 5700169644 <br> a/n Marudut Panggabean
                 <button onclick="kirimBuktiWA()"
                     style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Kirim
                     Bukti WA</button>
@@ -225,6 +223,7 @@
     </div>
 
     <script>
+        let currentSchoolName = "Sekolah Kami"; // Default jika data belum termuat
         // --- KONFIGURASI SUPABASE ---
         const SUPABASE_URL = 'https://fcjmcqwlaauuoheggjpp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjam1jcXdsYWF1dW9oZWdnanBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDU3OTQsImV4cCI6MjA5Mjk4MTc5NH0.SbisuJx1bfWUxcMhoqyLjpECPqtZHeRaPa6vAePGIdY';
@@ -236,6 +235,45 @@
         const clientId = urlParams.get('id') || 'sda-music';
         const SALT = "EDUTRACK-V3-SECRET";
 
+        async function initApp() {
+            const clientId = urlParams.get('id'); // Ambil slug dari URL (?id=sda-music)
+
+            if (!clientId) {
+                alert("ID Sekolah tidak ditemukan, Lur!");
+                return;
+            }
+
+            try {
+                // Ambil data sekolah langsung dari Supabase
+                const { data: school, error } = await _supabase
+                    .from('schools')
+                    .select('name, license_status')
+                    .eq('slug', clientId)
+                    .single();
+
+                if (error || !school) throw new Error("Sekolah tidak terdaftar");
+
+                // CEK STATUS LISENSI
+                if (school.license_status === 'active') {
+                    // JIKA AKTIF: Langsung buka aplikasi
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('tirai-pembayaran').style.display = 'none';
+                    console.log(`Selamat Datang di ${school.name}`);
+                    bukaSistem();
+                } else {
+                    // JIKA TRIAL/EXPIRED: Panggil fungsi tampilkanTirai dengan nama sekolah
+                    tampilkanTirai(school.name);
+                }
+
+            } catch (err) {
+                console.error("Error:", err);
+                document.getElementById('pesan-tirai').innerText = "Data Sekolah Tidak Ditemukan.";
+                document.getElementById('tirai-pembayaran').style.display = 'flex';
+            }
+        }
+
+        // Jalankan saat halaman siap
+        initApp();
         // 1. LOAD FROM CLOUD
         async function loadConfig() {
             try {
@@ -260,6 +298,13 @@
             } catch (err) {
                 document.getElementById('loading-screen').innerText = "Institusi belum terdaftar di Cloud, Lur.";
             }
+        }
+
+        function bukaSistem() {
+            if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
+            if (document.getElementById('tirai-pembayaran')) document.getElementById('tirai-pembayaran').style.display = 'none';
+            const mainApp = document.getElementById('main-app');
+            if (mainApp) mainApp.style.filter = 'none';
         }
 
         async function checkLicense() {
@@ -389,7 +434,69 @@
         function beep() {
             const ctx = new AudioContext(); const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.1);
         }
+        async function prosesAktivasi() {
+            const inputToken = document.getElementById('input-token').value;
+            const clientId = urlParams.get('id'); // Mengambil slug sekolah dari URL
 
+            if (!inputToken) return alert("Isi dulu tokennya, Lur!");
+
+            // 1. Validasi Token (Menggunakan logika hash Sampeyan atau cek langsung ke DB)
+            // Di sini kita asumsikan jika token valid, kita ubah status di database
+            if (await validateToken(inputToken, config.tokenHash)) {
+
+                try {
+                    // 2. Update status lisensi di tabel 'schools' berdasarkan slug (clientId)
+                    const { data, error } = await _supabase
+                        .from('schools')
+                        .update({
+                            license_status: 'active',
+                            // Optional: Sampeyan bisa simpan token yang dipakai agar tidak bisa dipakai ulang
+                            last_activation_token: inputToken
+                        })
+                        .eq('slug', clientId);
+
+                    if (error) throw error;
+
+                    // 3. Sukses! Tirai otomatis terbuka karena status di DB sudah 'active'
+                    alert("Berhasil! Tirai dibuka, sistem siap digunakan sepuasnya.");
+                    location.reload();
+
+                } catch (err) {
+                    console.error("Gagal aktivasi:", err);
+                    alert("Terjadi kesalahan koneksi ke database, Lur.");
+                }
+
+            } else {
+                alert("Token Salah atau Sudah Kadaluarsa, Lur!");
+            }
+        }
+        // Kita masukkan parameter 'schoolName' agar fungsinya dinamis
+        function tampilkanTirai(schoolName) {
+            // 1. Matikan loading screen setelah data selesai dicek
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) loadingScreen.style.display = 'none';
+
+            // 2. Set pesan personal sesuai nama sekolah di database
+            const pesanTirai = document.getElementById('pesan-tirai');
+            if (pesanTirai) {
+                pesanTirai.innerText = `Saudara ${schoolName}, masa freemium Anda sudah habis.`;
+            }
+
+            // 3. Munculkan tirai pembayaran dan beri efek blur pada aplikasi utama
+            document.getElementById('tirai-pembayaran').style.display = 'flex';
+
+            const mainApp = document.getElementById('main-app');
+            if (mainApp) mainApp.style.filter = 'blur(10px)';
+        }
+
+        function kirimBuktiWA() {
+            const phone = "6287809657300"; // Nomor Sampeyan
+
+            // Menggunakan currentSchoolName yang sudah dinamis dari Supabase
+            const pesan = encodeURIComponent(`Halo Lur, saya dari ${currentSchoolName} ingin kirim bukti transfer aktivasi EduTrack.`);
+
+            window.open(`https://wa.me/${phone}?text=${pesan}`, '_blank');
+        }
         loadConfig();
     </script>
 </body>
