@@ -154,7 +154,7 @@
         <h1 id="ui-school-name">Memuat Sekolah...</h1>
 
         <button class="btn-sync" onclick="syncDataLama()">
-            <i class="fas fa-sync"></i> Sync Data Lama
+            <i class="fas fa-sync"></i> Sync Data
         </button>
 
         <div
@@ -241,30 +241,28 @@
 
         // 2. FITUR SYNC (RESTORED)
         async function syncDataLama() {
-            // 1. Tentukan Key Utama secara dinamis (misal: logs_sansan-music)
-            let keyDinamis = `logs_${clientId}`;
+            // 1. Ambil nama sekolah secara dinamis agar tidak error
+            // Jika data sekolah belum terload, pakai fallback "Sekolah"
+            const namaSekolah = (window.schoolData && window.schoolData.name) ? window.schoolData.name : "Sekolah";
 
-            // Ambil data dari key dinamis
+            let keyDinamis = `logs_${clientId}`;
             let localLogs = JSON.parse(localStorage.getItem(keyDinamis)) || [];
 
-            // 2. LOGIKA KHUSUS SDA (Legacy Support)
-            // Kita cuma cek 'sda_logs' KALAU id sekolahnya memang sda-music
+            // Logika khusus SDA (Legacy)
             if (clientId === 'sda-music' && localLogs.length === 0) {
                 localLogs = JSON.parse(localStorage.getItem('sda_logs')) || [];
-                console.log("Mengecek data lama khusus SDA Music...");
             }
 
+            // Gunakan variabel namaSekolah yang baru didefinisikan di atas
             if (localLogs.length === 0) {
-                return alert(`Nggak ada data lama untuk ${currentSchoolName} di browser ini, Lur.`);
+                return alert(`Nggak ada data lama untuk ${namaSekolah} di browser ini, Lur.`);
             }
 
-            // Tampilkan loading di tombol
             const btnSync = document.querySelector('.btn-sync');
             const originalText = btnSync.innerHTML;
             btnSync.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sinkronisasi...';
             btnSync.disabled = true;
 
-            // 3. Mapping data ke struktur Cloud
             const cloudReady = localLogs.map(l => ({
                 school_id: schoolUUID,
                 student_info: l.info,
@@ -276,9 +274,8 @@
                 const { error } = await _supabase.from('attendance_logs').insert(cloudReady);
 
                 if (!error) {
-                    alert(`Suksess! ${localLogs.length} data ${currentSchoolName} sudah aman di Cloud.`);
+                    alert(`Sukses! ${localLogs.length} data ${namaSekolah} sudah aman di Cloud.`);
 
-                    // 4. Hapus hanya key yang relevan
                     localStorage.removeItem(keyDinamis);
                     if (clientId === 'sda-music') localStorage.removeItem('sda_logs');
 
