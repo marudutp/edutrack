@@ -241,19 +241,19 @@
 
         // 2. FITUR SYNC (RESTORED)
         async function syncDataLama() {
-            // 1. Ambil nama sekolah secara dinamis agar tidak error
-            // Jika data sekolah belum terload, pakai fallback "Sekolah"
+            // 1. Definisikan Nama Sekolah secara dinamis dari window.schoolData
+            // Jika data belum siap, kita beri nama standar "Sekolah"
             const namaSekolah = (window.schoolData && window.schoolData.name) ? window.schoolData.name : "Sekolah";
 
             let keyDinamis = `logs_${clientId}`;
             let localLogs = JSON.parse(localStorage.getItem(keyDinamis)) || [];
 
-            // Logika khusus SDA (Legacy)
+            // Logika khusus Legacy SDA Music
             if (clientId === 'sda-music' && localLogs.length === 0) {
                 localLogs = JSON.parse(localStorage.getItem('sda_logs')) || [];
             }
 
-            // Gunakan variabel namaSekolah yang baru didefinisikan di atas
+            // Gunakan variabel namaSekolah agar tidak ReferenceError
             if (localLogs.length === 0) {
                 return alert(`Nggak ada data lama untuk ${namaSekolah} di browser ini, Lur.`);
             }
@@ -276,6 +276,7 @@
                 if (!error) {
                     alert(`Sukses! ${localLogs.length} data ${namaSekolah} sudah aman di Cloud.`);
 
+                    // Hapus key yang relevan saja
                     localStorage.removeItem(keyDinamis);
                     if (clientId === 'sda-music') localStorage.removeItem('sda_logs');
 
