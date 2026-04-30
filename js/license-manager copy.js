@@ -1,37 +1,36 @@
-// 1. Definisikan variabel di paling ATAS
+// 1. Inisialisasi Variabel Global
 const urlParams = new URLSearchParams(window.location.search);
 const clientId = urlParams.get('id');
 
-// --- CONFIGURATION & GLOBAL VARS ---
 const SUPABASE_URL = 'https://fcjmcqwlaauuoheggjpp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjam1jcXdsYWF1dW9oZWdnanBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDU3OTQsImV4cCI6MjA5Mjk4MTc5NH0.SbisuJx1bfWUxcMhoqyLjpECPqtZHeRaPa6vAePGIdY';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 2. Fungsi Utama Satpam
+// 2. Fungsi Utama Inisialisasi
 async function initApp() {
     const loader = document.getElementById('loading-screen');
-    const tirai = document.getElementById('tirai-pembayaran');
-    const mainApp = document.getElementById('main-app');
-
     if (!clientId) {
         if (loader) loader.style.display = 'none';
-        showErrorPage("ID Sekolah tidak ditemukan di URL, Lur! Pastikan link Sampeyan benar.");
+        alert("ID Sekolah tidak ditemukan, Lur!");
         return;
     }
 
     try {
         const { data: school, error } = await _supabase
             .from('schools')
-            .select('id, name, license_status, salt, activation_token, logo_url, theme_color, footer_text')
+            // .select('name, license_status, salt, activation_token, logo_url, theme_color')
+            .select('*')
             .eq('slug', clientId)
             .single();
 
-        // Jika error dari Supabase atau data tidak ketemu
-        if (error || !school) throw new Error("Sekolah tidak terdaftar di sistem EduTrack.pro");
+        if (error || !school) throw new Error("Sekolah tidak terdaftar.");
 
-        // Simpan data ke Window agar bisa diakses di file index.html mana pun
+        // Simpan data ke Window agar bisa diakses di index.html
         window.schoolData = school;
-
+        // Jalankan update tampilan branding logo/warna di index.html jika fungsinya ada
+        if (typeof updateBranding === "function") {
+            updateBranding(school);
+        }
         if (school.license_status === 'active') {
             bukaSistem();
         } else {
@@ -40,26 +39,7 @@ async function initApp() {
     } catch (err) {
         console.error("Auth Error:", err);
         if (loader) loader.style.display = 'none';
-        
-        // INI SOLUSINYA: Munculkan pesan error di halaman, bukan cuma di console
-        showErrorPage(err.message || "Terjadi gangguan koneksi ke Cloud Engine.");
     }
-}
-
-// Fungsi untuk membuat tampilan error yang rapi jika sekolah tidak ada
-function showErrorPage(pesan) {
-    document.body.innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:'Segoe UI',sans-serif; padding:30px; text-align:center; background:#f8fafc;">
-            <div style="background:white; padding:40px; border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,0.05); max-width:450px;">
-                <i class="fas fa-exclamation-triangle" style="font-size:60px; color:#dc3545; margin-bottom:20px;"></i>
-                <h2 style="color:#1e293b; margin-bottom:10px;">Akses Ditolak, Lur!</h2>
-                <p style="color:#64748b; line-height:1.6; margin-bottom:25px;">${pesan}</p>
-                <a href="https://edutrack.pro" style="display:inline-block; text-decoration:none; background:#007bff; color:white; padding:12px 25px; border-radius:10px; font-weight:bold; transition:0.3s;">
-                    Kembali ke Beranda
-                </a>
-            </div>
-        </div>
-    `;
 }
 
 function bukaSistem() {
@@ -71,20 +51,17 @@ function bukaSistem() {
 function tampilkanTirai(name) {
     if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
     if (document.getElementById('tirai-pembayaran')) document.getElementById('tirai-pembayaran').style.display = 'flex';
-    if (document.getElementById('pesan-tirai')) {
-        document.getElementById('pesan-tirai').innerText = `Masa aktif untuk ${name} telah habis.`;
-    }
+    if (document.getElementById('pesan-tirai')) document.getElementById('pesan-tirai').innerText = `Masa aktif untuk ${name} telah habis.`;
 }
 
-// 3. Fungsi Aktivasi (Hashing & Update)
+// 3. Fungsi Aktivasi
 async function prosesAktivasi() {
     const tokenInput = document.getElementById('input-token').value;
-    if (!tokenInput) return alert("Isi tokennya dulu, Lur!");
+    if (!tokenInput) return alert("Isi tokennya, Lur!");
 
     const salt = window.schoolData.salt;
     const targetHash = window.schoolData.activation_token;
 
-    // Buat hash dari (Input + Salt)
     const userHash = await generateSHA256(tokenInput + salt);
 
     if (userHash === targetHash) {
@@ -94,13 +71,11 @@ async function prosesAktivasi() {
             .eq('slug', clientId);
 
         if (!error) {
-            alert("Mantap! Aktivasi Berhasil.");
+            alert("Aktivasi Berhasil!");
             bukaSistem();
-        } else {
-            alert("Gagal update database, cek internet Sampeyan.");
         }
     } else {
-        alert("Token Salah, Lur! Periksa kembali kode aktivasi Sampeyan.");
+        alert("Token Salah, Lur!");
     }
 }
 
@@ -109,4 +84,34 @@ async function generateSHA256(message) {
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function updateBranding(s) {
+    if (!s) return;
+
+    console.log("Menjalankan updateBranding untuk:", s.name);
+
+    // 1. Update Nama (Hanya jika elemennya ada)
+    const uiSchoolName = document.getElementById('ui-school-name');
+    const cardSchoolName = document.getElementById('card-school-name');
+    if (uiSchoolName) uiSchoolName.innerText = s.name;
+    if (cardSchoolName) cardSchoolName.innerText = s.name;
+
+    // 2. Update Logo (Hanya jika elemennya ada)
+    if (s.logo_url) {
+        const logoPath = `../${s.logo_url}`;
+        const uiLogo = document.getElementById('ui-logo');
+        const cardLogo = document.getElementById('card-logo');
+
+        if (uiLogo) {
+            uiLogo.src = logoPath;
+            uiLogo.style.display = 'block';
+        }
+        if (cardLogo) cardLogo.src = logoPath;
+    }
+
+    // 3. Update Warna Tema (Bisa tetap jalan karena targetnya :root)
+    if (s.theme_color) {
+        document.documentElement.style.setProperty('--primary', s.theme_color);
+    }
 }
