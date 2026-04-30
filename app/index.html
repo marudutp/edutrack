@@ -30,48 +30,96 @@
 
         #loading-screen {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white; display: flex; align-items: center; justify-content: center; z-index: 100000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
         }
 
         #tirai-pembayaran {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px);
-            z-index: 99999; display: none; align-items: center; justify-content: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
 
         .tirai-content {
-            background: white; padding: 30px; border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); max-width: 400px; width: 90%;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
         }
 
         .container {
-            max-width: 850px; margin: auto; display: none;
+            max-width: 850px;
+            margin: auto;
+            display: none;
         }
 
         .id-card {
-            width: 320px; height: 500px; background: white; border-radius: 20px;
-            border: 1px solid #ccc; margin: 20px auto; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow: hidden; display: none;
+            width: 320px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            margin: 20px auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: none;
         }
 
         .table-container {
-            max-height: 450px; overflow-y: auto; background: white;
-            border-radius: 10px; margin-top: 20px;
+            max-height: 450px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 10px;
+            margin-top: 20px;
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
 
         .cloud-badge {
-            background: #e0f2fe; color: #0369a1; padding: 4px 8px;
-            border-radius: 12px; font-size: 10px; font-weight: bold;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
         }
 
         .btn-sync {
-            background: #6c757d; color: white; border: none; padding: 10px 20px;
-            border-radius: 8px; cursor: pointer; margin-top: 10px; font-size: 14px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -84,36 +132,47 @@
         <div class="tirai-content">
             <h2>Akses Terkunci, Lur! 🙏</h2>
             <p id="pesan-tirai"></p>
-            <div style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
+            <div
+                style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
                 BCA 5700169644 <br> a/n Marudut Panggabean
-                <button onclick="window.open('https://wa.me/628123456789')" style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Kirim Bukti WA</button>
+                <button onclick="window.open('https://wa.me/628123456789')"
+                    style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Kirim
+                    Bukti WA</button>
             </div>
-            <input type="text" id="input-token" style="width:100%; padding:10px; margin-bottom:10px;" placeholder="Masukkan Token Aktivasi...">
-            <button onclick="prosesAktivasi()" style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:5px;">Aktifkan Sekarang</button>
+            <input type="text" id="input-token" style="width:100%; padding:10px; margin-bottom:10px;"
+                placeholder="Masukkan Token Aktivasi...">
+            <button onclick="prosesAktivasi()"
+                style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:5px;">Aktifkan
+                Sekarang</button>
         </div>
     </div>
 
     <div class="container" id="main-app">
         <div style="text-align: right;"><span class="cloud-badge">PRO CLOUD ACTIVE</span></div>
-        
+
         <img id="ui-logo" src="" style="width:80px; display:none; margin: 0 auto 10px auto; border-radius: 50%;">
         <h1 id="ui-school-name">Memuat Sekolah...</h1>
-        
+
         <button class="btn-sync" onclick="syncDataLama()">
             <i class="fas fa-sync"></i> Sync Data Lama
         </button>
 
-        <div style="padding: 20px; background:white; border-radius:12px; text-align:left; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 20px;">
+        <div
+            style="padding: 20px; background:white; border-radius:12px; text-align:left; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 20px;">
             <h3>ID Card Generator</h3>
-            <input type="text" id="inputNama" placeholder="Nama Siswa..." style="width:100%; padding:10px; margin-bottom:10px;">
+            <input type="text" id="inputNama" placeholder="Nama Siswa..."
+                style="width:100%; padding:10px; margin-bottom:10px;">
             <input type="date" id="inputJoinDate" style="width:100%; padding:10px; margin-bottom:10px;">
-            <button onclick="generateIDCard()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:5px;">Buat Kartu</button>
+            <button onclick="generateIDCard()"
+                style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:5px;">Buat
+                Kartu</button>
         </div>
 
         <div id="id-card-result">
             <div id="printableCard" class="id-card">
                 <div id="card-header" style="background:var(--primary); color:white; padding:20px; font-weight:bold;">
-                    <img id="card-logo" src="" style="width:50px; height:50px; border-radius:50%; border:2px solid white; object-fit: cover;"><br>
+                    <img id="card-logo" src=""
+                        style="width:50px; height:50px; border-radius:50%; border:2px solid white; object-fit: cover;"><br>
                     <span id="card-school-name"></span>
                 </div>
                 <div style="padding:20px;">
@@ -127,13 +186,19 @@
         <hr style="margin:40px 0; border:1px dashed #ccc;">
 
         <h3>Scanner & Jurnal Cloud</h3>
-        <button id="start-btn" onclick="startScanner()" style="width:100%; background:#28a745; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold;">Mulai Absensi</button>
+        <button id="start-btn" onclick="startScanner()"
+            style="width:100%; background:#28a745; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold;">Mulai
+            Absensi</button>
         <div id="reader"></div>
 
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>Siswa</th><th>Waktu</th><th>Catatan</th></tr>
+                    <tr>
+                        <th>Siswa</th>
+                        <th>Waktu</th>
+                        <th>Catatan</th>
+                    </tr>
                 </thead>
                 <tbody id="historyBody"></tbody>
             </table>
@@ -148,16 +213,16 @@
         // 1. JALANKAN SATPAM PUSAT
         window.addEventListener('DOMContentLoaded', async () => {
             await initApp(); // Fungsi di license-manager.js
-            
+
             // Setelah initApp selesai, data school ada di window.schoolData
             if (window.schoolData) {
                 const s = window.schoolData;
                 schoolUUID = s.id; // UUID untuk database
-                
+
                 // Update Branding UI
                 document.getElementById('ui-school-name').innerText = s.name;
                 document.getElementById('card-school-name').innerText = s.name;
-                
+
                 if (s.logo_url) {
                     const logoPath = `../${s.logo_url}`;
                     document.getElementById('ui-logo').src = logoPath;
@@ -176,8 +241,58 @@
 
         // 2. FITUR SYNC (RESTORED)
         async function syncDataLama() {
-            alert("Fitur Sinkronisasi Data Lama sedang berjalan...");
-            // Logika sync Sampeyan tetap di sini
+            // 1. Tentukan Key Utama secara dinamis (misal: logs_sansan-music)
+            let keyDinamis = `logs_${clientId}`;
+
+            // Ambil data dari key dinamis
+            let localLogs = JSON.parse(localStorage.getItem(keyDinamis)) || [];
+
+            // 2. LOGIKA KHUSUS SDA (Legacy Support)
+            // Kita cuma cek 'sda_logs' KALAU id sekolahnya memang sda-music
+            if (clientId === 'sda-music' && localLogs.length === 0) {
+                localLogs = JSON.parse(localStorage.getItem('sda_logs')) || [];
+                console.log("Mengecek data lama khusus SDA Music...");
+            }
+
+            if (localLogs.length === 0) {
+                return alert(`Nggak ada data lama untuk ${currentSchoolName} di browser ini, Lur.`);
+            }
+
+            // Tampilkan loading di tombol
+            const btnSync = document.querySelector('.btn-sync');
+            const originalText = btnSync.innerHTML;
+            btnSync.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sinkronisasi...';
+            btnSync.disabled = true;
+
+            // 3. Mapping data ke struktur Cloud
+            const cloudReady = localLogs.map(l => ({
+                school_id: schoolUUID,
+                student_info: l.info,
+                note: l.note || '',
+                created_at: l.ts
+            }));
+
+            try {
+                const { error } = await _supabase.from('attendance_logs').insert(cloudReady);
+
+                if (!error) {
+                    alert(`Suksess! ${localLogs.length} data ${currentSchoolName} sudah aman di Cloud.`);
+
+                    // 4. Hapus hanya key yang relevan
+                    localStorage.removeItem(keyDinamis);
+                    if (clientId === 'sda-music') localStorage.removeItem('sda_logs');
+
+                    renderTable();
+                } else {
+                    alert("Gagal sinkron, cek koneksi internet Sampeyan.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan teknis.");
+            } finally {
+                btnSync.innerHTML = originalText;
+                btnSync.disabled = false;
+            }
         }
 
         // 3. LOGIKA SCANNER & JURNAL (ASLI SAMPEYAN)
@@ -233,7 +348,7 @@
             const nama = document.getElementById('inputNama').value;
             const join = document.getElementById('inputJoinDate').value;
             if (!nama || !join) return alert("Data belum lengkap!");
-            
+
             document.getElementById('displayNama').innerText = nama;
             document.getElementById('displayJoinDate').innerText = join;
             document.getElementById('printableCard').style.display = 'block';
@@ -242,12 +357,13 @@
         }
 
         function beep() {
-            const ctx = new AudioContext(); 
-            const osc = ctx.createOscillator(); 
-            osc.connect(ctx.destination); 
-            osc.start(); 
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            osc.connect(ctx.destination);
+            osc.start();
             osc.stop(ctx.currentTime + 0.1);
         }
     </script>
 </body>
+
 </html>
