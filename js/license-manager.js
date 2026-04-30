@@ -85,3 +85,32 @@ async function generateSHA256(message) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
+// Fungsi untuk memperbarui semua identitas visual sekolah
+function updateBranding(s) {
+    if (!s) return;
+
+    console.log("Menjalankan updateBranding untuk:", s.name);
+
+    // 1. Update Nama Sekolah
+    document.getElementById('ui-school-name').innerText = s.name;
+    document.getElementById('card-school-name').innerText = s.name;
+
+    // 2. Update Logo (Cek apakah ada datanya)
+    if (s.logo_url) {
+        // Sesuaikan path jika folder logo ada di root
+        const logoPath = `../${s.logo_url}`; 
+        
+        const uiLogo = document.getElementById('ui-logo');
+        const cardLogo = document.getElementById('card-logo');
+
+        uiLogo.src = logoPath;
+        uiLogo.style.display = 'block'; // Tampilkan logo yang tadinya hidden
+        cardLogo.src = logoPath;
+    }
+
+    // 3. Update Warna Tema
+    if (s.theme_color) {
+        document.documentElement.style.setProperty('--primary', s.theme_color);
+    }
+}
