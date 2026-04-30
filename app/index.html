@@ -242,7 +242,7 @@
             console.log("1. DOM Loaded - Memulai initApp...");
             await initApp();
             console.log("2. initApp Selesai. Data school:", window.schoolData);
-
+            console.log("Daftar kunci properti yang ada:", Object.keys(window.schoolData));
             if (window.schoolData) {
                 const s = window.schoolData;
                 schoolUUID = s.id;
