@@ -211,31 +211,52 @@
         let schoolUUID = null;
 
         // 1. JALANKAN SATPAM PUSAT
-        window.addEventListener('DOMContentLoaded', async () => {
-            await initApp(); // Fungsi di license-manager.js
+        // window.addEventListener('DOMContentLoaded', async () => {
+        //     await initApp(); // Fungsi di license-manager.js
 
-            // Setelah initApp selesai, data school ada di window.schoolData
+        //     // Setelah initApp selesai, data school ada di window.schoolData
+        //     if (window.schoolData) {
+        //         const s = window.schoolData;
+        //         schoolUUID = s.id; // UUID untuk database
+
+        //         // Update Branding UI
+        //         document.getElementById('ui-school-name').innerText = s.name;
+        //         document.getElementById('card-school-name').innerText = s.name;
+
+        //         if (s.logo_url) {
+        //             const logoPath = `../${s.logo_url}`;
+        //             document.getElementById('ui-logo').src = logoPath;
+        //             document.getElementById('ui-logo').style.display = 'block';
+        //             document.getElementById('card-logo').src = logoPath;
+        //         }
+
+        //         if (s.theme_color) {
+        //             document.documentElement.style.setProperty('--primary', s.theme_color);
+        //         }
+
+        //         // Load Data Awal
+        //         renderTable();
+        //     }
+        // });
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log("1. DOM Loaded - Memulai initApp...");
+            await initApp();
+            console.log("2. initApp Selesai. Data school:", window.schoolData);
+
             if (window.schoolData) {
                 const s = window.schoolData;
-                schoolUUID = s.id; // UUID untuk database
+                schoolUUID = s.id;
+                console.log("3. schoolUUID yang diset:", schoolUUID);
 
-                // Update Branding UI
+                // Branding UI
                 document.getElementById('ui-school-name').innerText = s.name;
                 document.getElementById('card-school-name').innerText = s.name;
+                // ... (sisanya tetap sama)
 
-                if (s.logo_url) {
-                    const logoPath = `../${s.logo_url}`;
-                    document.getElementById('ui-logo').src = logoPath;
-                    document.getElementById('ui-logo').style.display = 'block';
-                    document.getElementById('card-logo').src = logoPath;
-                }
-
-                if (s.theme_color) {
-                    document.documentElement.style.setProperty('--primary', s.theme_color);
-                }
-
-                // Load Data Awal
+                console.log("4. Memanggil renderTable...");
                 renderTable();
+            } else {
+                console.error("EROR: window.schoolData tidak ditemukan!");
             }
         });
 
@@ -302,26 +323,61 @@
             });
         }
 
+        // async function renderTable() {
+        //     if (!schoolUUID) return;console.log("Mencari data untuk UUID:", schoolUUID); // <-- Tambahkan ini
+        //     const { data: logs, error } = await _supabase
+        //         .from('attendance_logs')
+        //         .select('*')
+        //         .eq('school_id', schoolUUID)
+        //         .order('created_at', { ascending: false });
+
+        //     if (!error) {
+        //         document.getElementById('historyBody').innerHTML = logs.map(i => `
+        //         <tr>
+        //             <td><strong>${i.student_info}</strong></td>
+        //             <td>${new Date(i.created_at).toLocaleString('id-ID')}</td>
+        //             <td>
+        //                 <div style="display:flex; gap:5px;">
+        //                     <input type="text" id="note-${i.id}" value="${i.note || ''}" style="width:100%; border:1px solid #ddd;">
+        //                     <button onclick="saveNoteCloud(${i.id})" style="background:var(--success); color:white; border:none; padding:5px;">Simpan</button>
+        //                 </div>
+        //             </td>
+        //         </tr>`).join('');
+        //     }
+        // }
+
         async function renderTable() {
-            if (!schoolUUID) return;console.log("Mencari data untuk UUID:", schoolUUID); // <-- Tambahkan ini
+            console.log("5. renderTable sedang berjalan...");
+
+            if (!schoolUUID) {
+                console.error("6. renderTable BERHENTI: schoolUUID kosong!");
+                return;
+            }
+
+            console.log("7. Mengambil data dari Supabase untuk ID:", schoolUUID);
+
             const { data: logs, error } = await _supabase
                 .from('attendance_logs')
                 .select('*')
                 .eq('school_id', schoolUUID)
                 .order('created_at', { ascending: false });
 
-            if (!error) {
+            if (error) {
+                console.error("8. Supabase Error:", error);
+            } else {
+                console.log("9. Data berhasil ditarik. Jumlah:", logs.length);
+
                 document.getElementById('historyBody').innerHTML = logs.map(i => `
-                <tr>
-                    <td><strong>${i.student_info}</strong></td>
-                    <td>${new Date(i.created_at).toLocaleString('id-ID')}</td>
-                    <td>
-                        <div style="display:flex; gap:5px;">
-                            <input type="text" id="note-${i.id}" value="${i.note || ''}" style="width:100%; border:1px solid #ddd;">
-                            <button onclick="saveNoteCloud(${i.id})" style="background:var(--success); color:white; border:none; padding:5px;">Simpan</button>
-                        </div>
-                    </td>
-                </tr>`).join('');
+        <tr>
+            <td><strong>${i.student_info}</strong></td>
+            <td>${new Date(i.created_at).toLocaleString('id-ID')}</td>
+            <td>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="note-${i.id}" value="${i.note || ''}" style="width:100%; border:1px solid #ddd;">
+                    <button onclick="saveNoteCloud(${i.id})" style="background:var(--success); color:white; border:none; padding:5px;">Simpan</button>
+                </div>
+            </td>
+        </tr>`).join('');
             }
         }
 
