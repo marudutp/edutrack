@@ -303,7 +303,7 @@
         }
 
         async function renderTable() {
-            if (!schoolUUID) return;
+            if (!schoolUUID) return;console.log("Mencari data untuk UUID:", schoolUUID); // <-- Tambahkan ini
             const { data: logs, error } = await _supabase
                 .from('attendance_logs')
                 .select('*')
