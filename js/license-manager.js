@@ -86,3 +86,32 @@ async function generateSHA256(message) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+function updateBranding(s) {
+    if (!s) return;
+
+    console.log("Menjalankan updateBranding untuk:", s.name);
+
+    // 1. Update Nama (Hanya jika elemennya ada)
+    const uiSchoolName = document.getElementById('ui-school-name');
+    const cardSchoolName = document.getElementById('card-school-name');
+    if (uiSchoolName) uiSchoolName.innerText = s.name;
+    if (cardSchoolName) cardSchoolName.innerText = s.name;
+
+    // 2. Update Logo (Hanya jika elemennya ada)
+    if (s.logo_url) {
+        const logoPath = `../${s.logo_url}`;
+        const uiLogo = document.getElementById('ui-logo');
+        const cardLogo = document.getElementById('card-logo');
+
+        if (uiLogo) {
+            uiLogo.src = logoPath;
+            uiLogo.style.display = 'block';
+        }
+        if (cardLogo) cardLogo.src = logoPath;
+    }
+
+    // 3. Update Warna Tema (Bisa tetap jalan karena targetnya :root)
+    if (s.theme_color) {
+        document.documentElement.style.setProperty('--primary', s.theme_color);
+    }
+}
