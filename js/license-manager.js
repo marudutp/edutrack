@@ -18,7 +18,8 @@ async function initApp() {
     try {
         const { data: school, error } = await _supabase
             .from('schools')
-            .select('name, license_status, salt, activation_token, logo_url, theme_color')
+            // .select('name, license_status, salt, activation_token, logo_url, theme_color')
+            .select('*')
             .eq('slug', clientId)
             .single();
 
