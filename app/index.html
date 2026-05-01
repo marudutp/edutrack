@@ -10,51 +10,32 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <script src="../js/license-manager.js"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root {
-            --primary: #007bff;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --info: #17a2b8;
-            --light: #f0f2f5;
-            --dark: #333;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            text-align: center;
-            background: var(--light);
-            margin: 0;
-            padding: 20px;
-        }
-
-        /* Loading & Tirai */
+        :root { --primary: #007bff; --success: #28a745; --warning: #ffc107; --danger: #dc3545; --info: #17a2b8; --light: #f0f2f5; --dark: #333; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; background: var(--light); margin: 0; padding: 20px; }
+        
         #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; align-items: center; justify-content: center; z-index: 100000; }
         #tirai-pembayaran { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px); z-index: 99999; display: none; align-items: center; justify-content: center; }
         .tirai-content { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); max-width: 400px; width: 90%; }
-
+        
         .container { max-width: 850px; margin: auto; display: none; }
-
-        /* ID Card Style dari Versi Absensi */
         .id-card { width: 320px; height: 500px; background: white; border-radius: 20px; border: 1px solid #ccc; margin: 20px auto; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); overflow: hidden; display: none; }
         .btn-group-card { display: none; margin-top: 20px; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .btn-action { border: none; padding: 12px 18px; border-radius: 10px; color: white; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: 0.3s; }
-        .btn-action:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-
+        .btn-action { border: none; padding: 12px 18px; border-radius: 10px; color: white; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        
         .search-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); text-align: left; margin-bottom: 30px; }
         .table-container { max-height: 500px; overflow-y: auto; background: white; border-radius: 15px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8fafc; padding: 15px; position: sticky; top: 0; border-bottom: 2px solid #eee; }
         td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
 
-        .cloud-badge { background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: bold; }
+        .input-style { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
         .btn-sync { background: #64748b; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 10px; }
+        
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; display: none; margin-top: 15px; border: 2px solid var(--primary); }
     </style>
 </head>
 
@@ -66,34 +47,25 @@
         <div class="tirai-content">
             <h2>Akses Terkunci, Lur! 🙏</h2>
             <p id="pesan-tirai"></p>
-            <div style="background:#fff3cd; padding:15px; border-radius:10px; margin:20px 0; border:2px dashed #ffc107;">
-                BCA 5700169644 <br> a/n Marudut Panggabean
-                <button onclick="window.open('https://wa.me/6281315582319')" style="width:100%; margin-top:10px; background:#25D366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Kirim Bukti WA</button>
-            </div>
-            <input type="text" id="input-token" style="width:100%; padding:10px; margin-bottom:10px;" placeholder="Masukkan Token Aktivasi...">
-            <button onclick="prosesAktivasi()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:5px;">Aktifkan Sekarang</button>
+            <input type="text" id="input-token" class="input-style" placeholder="Masukkan Token Aktivasi...">
+            <button onclick="prosesAktivasi()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:5px; cursor:pointer;">Aktifkan Sekarang</button>
         </div>
     </div>
 
     <div class="container" id="main-app">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <button class="btn-sync" onclick="syncDataLama()"><i class="fas fa-sync"></i> Sync Data Lama</button>
-            <span class="cloud-badge"><i class="fas fa-cloud"></i> PRO CLOUD ACTIVE</span>
+            <span style="font-size: 10px; font-weight: bold; background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 12px;"><i class="fas fa-cloud"></i> PRO CLOUD ACTIVE</span>
         </div>
 
-        <img id="ui-logo" src="" style="width:90px; height:90px; display:none; margin: 0 auto 10px auto; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <img id="ui-logo" src="" style="width:90px; height:90px; display:none; margin: 0 auto 10px auto; border-radius: 50%; object-fit: cover; border: 3px solid white;">
         <h1 id="ui-school-name" style="margin: 0;">Memuat Sekolah...</h1>
-        <p id="ui-footer-text" style="color: #64748b; font-size: 14px; margin-top: 5px;"></p>
 
-        <div class="search-card">
-            <h3 style="margin-top: 0;"><i class="fas fa-id-card"></i> ID Card Generator</h3>
-            <div style="display: grid; gap: 10px;">
-                <input type="text" id="inputNama" placeholder="Nama Lengkap Siswa..." style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-                <input type="date" id="inputJoinDate" style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-                <button onclick="generateIDCard()" style="padding: 15px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
-                    BUAT KARTU IDENTITAS
-                </button>
-            </div>
+        <div class="search-card" style="margin-top: 20px;">
+            <h3><i class="fas fa-id-card"></i> ID Card Generator</h3>
+            <input type="text" id="inputNama" placeholder="Nama Lengkap Siswa..." class="input-style">
+            <input type="date" id="inputJoinDate" class="input-style">
+            <button onclick="generateIDCard()" style="width:100%; padding: 15px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">BUAT KARTU</button>
         </div>
 
         <div id="id-card-result">
@@ -106,33 +78,39 @@
                     <div id="qrcode" style="display:flex; justify-content:center; margin:20px 0;"></div>
                     <div id="displayNama" style="font-size:24px; font-weight:bold; color: var(--dark);"></div>
                     <div style="color:#64748b; margin-top: 5px;">Joined: <span id="displayJoinDate"></span></div>
-                    <div style="font-size: 10px; color: #94a3b8; margin-top: 20px; font-style: italic;" id="card-footer-text"></div>
                 </div>
             </div>
 
             <div id="card-actions" class="btn-group-card">
                 <button class="btn-action" style="background:var(--info);" onclick="shareWA()"><i class="fab fa-whatsapp"></i> Share</button>
-                <button class="btn-action" style="background:var(--warning); color: #333;" onclick="printCard()"><i class="fas fa-print"></i> Cetak</button>
-                <button class="btn-action" style="background:var(--success);" onclick="downloadCard()"><i class="fas fa-image"></i> Simpan PNG</button>
+                <button class="btn-action" style="background:var(--warning); color:#333;" onclick="printCard()"><i class="fas fa-print"></i> Cetak</button>
+                <button class="btn-action" style="background:var(--success);" onclick="downloadCard()"><i class="fas fa-image"></i> PNG</button>
             </div>
         </div>
 
-        <hr style="margin:40px 0; border:0; border-top: 2px dashed #cbd5e1;">
+        <hr style="margin:40px 0; border:1px dashed #ccc;">
 
-        <h3><i class="fas fa-qrcode"></i> Scanner & Jurnal Harian</h3>
-        <button id="start-btn" onclick="startScanner()" style="width:100%; background:var(--success); color:white; border:none; padding:18px; border-radius:12px; font-weight:bold; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
-            <i class="fas fa-camera"></i> MULAI SCAN ABSENSI
-        </button>
-        <div id="reader" style="width: 100%; border-radius: 15px; overflow: hidden; margin-top: 15px;"></div>
+        <h3><i class="fas fa-camera"></i> Scanner & Jurnal Cloud</h3>
+        
+        <div style="display: flex; gap: 10px;">
+            <button id="start-btn" onclick="startScanner()" style="flex: 2; background:var(--success); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">
+                <i class="fas fa-camera"></i> MULAI SCAN
+            </button>
+            <button id="stop-btn" onclick="stopScanner()" style="flex: 1; background:var(--danger); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:none;">
+                <i class="fas fa-times"></i> TUTUP
+            </button>
+        </div>
+
+        <div id="reader"></div>
+
+        <div style="margin-top: 20px;">
+            <input type="text" id="search-jurnal" onkeyup="filterJurnal()" placeholder="🔍 Cari Nama Siswa di Riwayat..." class="input-style">
+        </div>
 
         <div class="table-container">
             <table>
                 <thead>
-                    <tr>
-                        <th width="30%">Nama Siswa</th>
-                        <th width="25%">Waktu Scan</th>
-                        <th width="45%">Catatan Jurnal (Notes)</th>
-                    </tr>
+                    <tr><th>Nama Siswa</th><th>Waktu</th><th>Catatan Jurnal</th></tr>
                 </thead>
                 <tbody id="historyBody"></tbody>
             </table>
@@ -142,147 +120,88 @@
     <script>
         let html5QrCode;
         let schoolUUID = null;
+        
+        // FITUR 2: LOGIKA ANTI DOUBLE-SCAN
+        let lastScannedData = null;
+        let lastScannedTime = 0;
 
-        // 1. INISIALISASI BRANDING & SISTEM
         window.addEventListener('DOMContentLoaded', async () => {
-            await initApp(); // Satpam di license-manager.js
-
+            await initApp();
             if (window.schoolData) {
                 const s = window.schoolData;
                 schoolUUID = s.id;
-                
-                // Set UI & Branding
                 document.getElementById('ui-school-name').innerText = s.name;
                 document.getElementById('card-school-name').innerText = s.name;
-                document.getElementById('ui-footer-text').innerText = s.footer_text || '';
-                document.getElementById('card-footer-text').innerText = s.footer_text || '';
-
                 if (s.logo_url) {
                     const logoPath = `../${s.logo_url}`;
                     document.getElementById('ui-logo').src = logoPath;
                     document.getElementById('ui-logo').style.display = 'block';
                     document.getElementById('card-logo').src = logoPath;
                 }
-
-                if (s.theme_color) {
-                    document.documentElement.style.setProperty('--primary', s.theme_color);
-                }
-
+                if (s.theme_color) document.documentElement.style.setProperty('--primary', s.theme_color);
                 renderTable();
             }
         });
 
-        // 2. LOGIKA MIGRASI (SYNC DATA LAMA)
-        async function syncDataLama() {
-            const namaSekolah = (window.schoolData && window.schoolData.name) ? window.schoolData.name : "Sekolah";
-            let keyDinamis = `logs_${clientId}`;
-            let localLogs = JSON.parse(localStorage.getItem(keyDinamis)) || [];
-            
-            if (clientId === 'sda-music' && localLogs.length === 0) {
-                localLogs = JSON.parse(localStorage.getItem('sda_logs')) || [];
+        // FITUR 3: FUNGSI STOP SCANNER
+        async function stopScanner() {
+            if (html5QrCode) {
+                await html5QrCode.stop();
+                document.getElementById('reader').style.display = 'none';
+                document.getElementById('start-btn').style.display = 'block';
+                document.getElementById('stop-btn').style.display = 'none';
             }
-            
-            if (localLogs.length === 0) return alert(`Nggak ada data lama untuk ${namaSekolah}, Lur.`);
-
-            const btn = document.querySelector('.btn-sync');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
-
-            const cloudReady = localLogs.map(l => ({
-                school_id: schoolUUID, student_info: l.info, note: l.note || '', created_at: l.ts || new Date().toISOString()
-            }));
-
-            const { error } = await _supabase.from('attendance_logs').insert(cloudReady);
-            if (!error) {
-                alert("Sukses! Data lama sudah aman di Cloud.");
-                localStorage.removeItem(keyDinamis);
-                if (clientId === 'sda-music') localStorage.removeItem('sda_logs');
-                renderTable();
-            } else {
-                alert("Gagal sinkron, Lur.");
-            }
-            btn.innerHTML = '<i class="fas fa-sync"></i> Sync Data Lama';
         }
 
-        // 3. GENERATOR KARTU & AKSI (SHARE, CETAK, PNG)
-        function generateIDCard() {
-            const nama = document.getElementById('inputNama').value.trim();
-            const join = document.getElementById('inputJoinDate').value;
-            if (!nama || !join) return alert("Isi nama dan tanggal dulu, Lur!");
-            
-            document.getElementById('displayNama').innerText = nama;
-            document.getElementById('displayJoinDate').innerText = join;
-            document.getElementById('printableCard').style.display = 'block';
-            document.getElementById('card-actions').style.display = 'flex';
-            
-            document.getElementById('qrcode').innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), { 
-                text: `${clientId}-${nama}`, 
-                width: 160, 
-                height: 160,
-                colorDark : "#000000",
-                colorLight : "#ffffff"
-            });
-        }
-
-        function downloadCard() {
-            const card = document.getElementById("printableCard");
-            html2canvas(card, { scale: 2 }).then(canvas => {
-                const link = document.createElement("a");
-                link.download = `ID-${document.getElementById('displayNama').innerText}.png`;
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-            });
-        }
-
-        function printCard() {
-            const cardContent = document.getElementById("printableCard").innerHTML;
-            const style = document.querySelector('style').innerHTML;
-            const win = window.open('', '', 'height=800,width=600');
-            win.document.write(`<html><head><style>${style} .id-card{display:block !important; margin: 0; shadow:none; border:none;}</style></head>`);
-            win.document.write(`<body style="display:flex; justify-content:center; padding-top:20px;">`);
-            win.document.write(`<div class="id-card">${cardContent}</div>`);
-            win.document.write(`</body></html>`);
-            win.document.close();
-            setTimeout(() => { win.print(); win.close(); }, 500);
-        }
-
-        function shareWA() {
-            const nama = document.getElementById('displayNama').innerText;
-            const pesan = encodeURIComponent(`Halo, ini Kartu Identitas EduTrack untuk *${nama}*. Silakan disimpan untuk absensi.`);
-            window.open(`https://wa.me/?text=${pesan}`, '_blank');
-        }
-
-        // 4. SCANNER & JURNAL CLOUD
         async function startScanner() {
             document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('stop-btn').style.display = 'block';
+            document.getElementById('reader').style.display = 'block';
+
             html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, (text) => {
+                
+                // FITUR 2: CEK DOUBLE SCAN (Cooldown 5 detik untuk data yang sama)
+                const now = Date.now();
+                if (text === lastScannedData && (now - lastScannedTime) < 5000) {
+                    console.log("Data sama, abaikan lur...");
+                    return;
+                }
+
+                lastScannedData = text;
+                lastScannedTime = now;
+                
                 saveDataCloud(text);
             }).catch(err => {
-                alert("Kamera tidak diizinkan atau tidak ditemukan, Lur.");
-                document.getElementById('start-btn').style.display = 'block';
+                alert("Kamera Error, Lur!");
+                stopScanner();
+            });
+        }
+
+        // FITUR 1: FUNGSI CARI SISWA
+        function filterJurnal() {
+            const input = document.getElementById('search-jurnal').value.toLowerCase();
+            const rows = document.querySelectorAll('#historyBody tr');
+            rows.forEach(row => {
+                const studentName = row.cells[0].innerText.toLowerCase();
+                row.style.display = studentName.includes(input) ? '' : 'none';
             });
         }
 
         async function renderTable() {
             if (!schoolUUID) return;
-            const { data: logs, error } = await _supabase
-                .from('attendance_logs')
-                .select('*')
-                .eq('school_id', schoolUUID)
-                .order('created_at', { ascending: false });
+            const { data: logs, error } = await _supabase.from('attendance_logs').select('*')
+                .eq('school_id', schoolUUID).order('created_at', { ascending: false });
 
             if (!error) {
                 document.getElementById('historyBody').innerHTML = logs.map(i => `
                 <tr>
                     <td><strong>${i.student_info}</strong></td>
-                    <td style="font-size:13px; color:#64748b;">${new Date(i.created_at).toLocaleString('id-ID')}</td>
+                    <td style="font-size:12px; color:#666;">${new Date(i.created_at).toLocaleString('id-ID')}</td>
                     <td>
                         <div style="display:flex; gap:5px;">
-                            <input type="text" id="note-${i.id}" value="${i.note || ''}" placeholder="Tulis jurnal..." style="flex:1; padding:8px; border:1px solid #ddd; border-radius:5px;">
-                            <button onclick="saveNoteCloud(${i.id})" style="background:var(--success); color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">
-                                <i class="fas fa-save"></i>
-                            </button>
+                            <input type="text" id="note-${i.id}" value="${i.note || ''}" placeholder="Notes..." style="flex:1; border:1px solid #ddd; padding:5px; border-radius:5px;">
+                            <button onclick="saveNoteCloud(${i.id})" style="background:var(--success); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;"><i class="fas fa-save"></i></button>
                         </div>
                     </td>
                 </tr>`).join('');
@@ -290,35 +209,76 @@
         }
 
         async function saveDataCloud(val) {
-            const { error } = await _supabase
-                .from('attendance_logs')
-                .insert([{ school_id: schoolUUID, student_info: val }]);
+            const { error } = await _supabase.from('attendance_logs').insert([{ school_id: schoolUUID, student_info: val }]);
             if (!error) { renderTable(); beep(); }
         }
 
         async function saveNoteCloud(logId) {
             const noteVal = document.getElementById(`note-${logId}`).value;
-            const { error } = await _supabase
-                .from('attendance_logs')
-                .update({ note: noteVal })
-                .eq('id', logId);
-            
+            const { error } = await _supabase.from('attendance_logs').update({ note: noteVal }).eq('id', logId);
+            if (!error) alert("Notes Tersimpan!");
+        }
+
+        // --- FUNGSI GENERATOR KARTU (TETAP SAMA) ---
+        function generateIDCard() {
+            const nama = document.getElementById('inputNama').value.trim();
+            const join = document.getElementById('inputJoinDate').value;
+            if (!nama || !join) return alert("Data belum lengkap!");
+            document.getElementById('displayNama').innerText = nama;
+            document.getElementById('displayJoinDate').innerText = join;
+            document.getElementById('printableCard').style.display = 'block';
+            document.getElementById('card-actions').style.display = 'flex';
+            document.getElementById('qrcode').innerHTML = "";
+            new QRCode(document.getElementById("qrcode"), { text: `${clientId}-${nama}`, width: 160, height: 160 });
+        }
+
+        function downloadCard() {
+            const card = document.getElementById("printableCard");
+            html2canvas(card, { scale: 2 }).then(canvas => {
+                const link = document.createElement("a");
+                link.download = `ID-${document.getElementById('displayNama').innerText}.png`;
+                link.href = canvas.toDataURL(); link.click();
+            });
+        }
+
+        function printCard() {
+            const card = document.getElementById("printableCard").innerHTML;
+            const win = window.open('', '', 'height=800,width=600');
+            win.document.write(`<html><head><style>body{text-align:center; padding:50px; font-family:sans-serif;} .id-card{width:320px; border:1px solid #ccc; border-radius:20px; overflow:hidden; margin:auto;}</style></head><body><div class="id-card">${card}</div></body></html>`);
+            win.document.close(); setTimeout(() => { win.print(); win.close(); }, 500);
+        }
+
+        function shareWA() {
+            const nama = document.getElementById('displayNama').innerText;
+            const pesan = encodeURIComponent(`Halo, ini Kartu Identitas EduTrack untuk *${nama}*.`);
+            window.open(`https://wa.me/?text=${pesan}`, '_blank');
+        }
+
+        async function syncDataLama() {
+            const namaSekolah = (window.schoolData && window.schoolData.name) ? window.schoolData.name : "Sekolah";
+            let keyDinamis = `logs_${clientId}`;
+            let localLogs = JSON.parse(localStorage.getItem(keyDinamis)) || [];
+            if (clientId === 'sda-music' && localLogs.length === 0) {
+                localLogs = JSON.parse(localStorage.getItem('sda_logs')) || [];
+            }
+            if (localLogs.length === 0) return alert(`Nggak ada data lama untuk ${namaSekolah}.`);
+            const cloudReady = localLogs.map(l => ({ school_id: schoolUUID, student_info: l.info, note: l.note || '', created_at: l.ts }));
+            const { error } = await _supabase.from('attendance_logs').insert(cloudReady);
             if (!error) {
-                alert("Catatan Jurnal Berhasil Disimpan, Lur!");
+                alert("Sinkronisasi Berhasil!");
+                localStorage.removeItem(keyDinamis);
+                if (clientId === 'sda-music') localStorage.removeItem('sda_logs');
+                renderTable();
             }
         }
 
         function beep() {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
+            const osc = ctx.createOscillator(); const gain = ctx.createGain();
             osc.connect(gain); gain.connect(ctx.destination);
-            osc.frequency.value = 880;
-            osc.start();
-            gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
-            osc.stop(ctx.currentTime + 0.1);
+            osc.frequency.value = 880; gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+            osc.start(); osc.stop(ctx.currentTime + 0.1);
         }
     </script>
 </body>
-
 </html>
