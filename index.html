@@ -473,18 +473,50 @@
         });
 
         async function registerSekolah(nama, wa) {
+            // Buat slug dari nama sekolah
             const slug = nama.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
-            const { data: existing } = await _supabase.from('schools').select('id').eq('slug', slug).single();
-            if (existing) return; // Slug sudah ada, biarkan admin menangani manual via WA
+            console.log("Mengecek ketersediaan slug:", slug);
 
-            await _supabase.from('schools').insert([{
-                slug: slug,
-                name: nama,
-                joined_date: new Date().toISOString().split('T')[0],
-                license_status: 'trial',
-                delete_password: 'admin' + Math.floor(1000 + Math.random() * 9000)
-            }]);
+            try {
+                // 1. GUNAKAN .maybeSingle() agar tidak error 406 jika data tidak ditemukan
+                const { data: existing, error: checkError } = await _supabase
+                    .from('schools')
+                    .select('id')
+                    .eq('slug', slug)
+                    .maybeSingle();
+
+                if (checkError) {
+                    console.error("Error saat cek slug:", checkError.message);
+                    return;
+                }
+
+                if (existing) {
+                    console.warn("Sekolah sudah terdaftar, Lur. Tidak perlu insert lagi.");
+                    return;
+                }
+
+                // 2. Jika belum ada, baru kita Insert
+                console.log("Mendaftarkan sekolah baru ke Cloud...");
+                const { data, error: insertError } = await _supabase
+                    .from('schools')
+                    .insert([{
+                        slug: slug,
+                        name: nama,
+                        joined_date: new Date().toISOString().split('T')[0],
+                        license_status: 'trial',
+                        delete_password: 'admin' + Math.floor(1000 + Math.random() * 9000)
+                    }]);
+
+                if (insertError) {
+                    console.error("Gagal simpan ke Cloud:", insertError.message);
+                } else {
+                    console.log("Sukses! Data Sanggar baru sudah masuk ke Supabase, Lur.");
+                }
+
+            } catch (err) {
+                console.error("Fatal Error di fungsi registrasi:", err);
+            }
         }
     </script>
 
