@@ -116,7 +116,10 @@
             transition: 0.3s;
         }
 
-        .info-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
 
         .step-tag {
             background: var(--primary);
@@ -145,7 +148,9 @@
             cursor: pointer;
         }
 
-        .faq-item:last-child { border-bottom: none; }
+        .faq-item:last-child {
+            border-bottom: none;
+        }
 
         .faq-q {
             font-weight: 700;
@@ -267,9 +272,11 @@
 
 <body>
 
+   
+
     <div class="announcement-bar">
         <i class="fas fa-bullhorn"></i>
-        <span><strong>Update Mei 2026:</strong> Fitur Jurnal Cloud & Anti-Double Scan sudah aktif untuk semua institusi!</span>
+        <span id="announcement-text">Memuat informasi terbaru...</span>
     </div>
 
     <nav>
@@ -307,7 +314,8 @@
             <div class="info-card">
                 <div class="step-tag">1</div>
                 <h3>Klaim Aplikasi</h3>
-                <p>Isi formulir pendaftaran di bawah. Sistem kami akan menyiapkan database khusus untuk sekolah Anda.</p>
+                <p>Isi formulir pendaftaran di bawah. Sistem kami akan menyiapkan database khusus untuk sekolah Anda.
+                </p>
             </div>
             <div class="info-card">
                 <div class="step-tag">2</div>
@@ -368,15 +376,18 @@
         <div class="faq-wrapper">
             <div class="faq-item" onclick="toggleFAQ(this)">
                 <div class="faq-q">Apakah data saya aman di Cloud? <i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">Aman banget, Lur! EduTrack menggunakan enkripsi SSL dan database terpisah untuk setiap institusi. Data Anda tidak akan tertukar atau hilang.</div>
+                <div class="faq-a">Aman banget, Lur! EduTrack menggunakan enkripsi SSL dan database terpisah untuk
+                    setiap institusi. Data Anda tidak akan tertukar atau hilang.</div>
             </div>
             <div class="faq-item" onclick="toggleFAQ(this)">
                 <div class="faq-q">Apakah orang tua perlu download aplikasi? <i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">Tidak perlu. Orang tua cukup akses portal lewat browser HP (PWA). Simpel dan tidak bikin memori HP penuh.</div>
+                <div class="faq-a">Tidak perlu. Orang tua cukup akses portal lewat browser HP (PWA). Simpel dan tidak
+                    bikin memori HP penuh.</div>
             </div>
             <div class="faq-item" onclick="toggleFAQ(this)">
                 <div class="faq-q">Bagaimana jika internet di sekolah mati? <i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">EduTrack punya fitur Sync Offline. Guru tetap bisa scan, dan data akan otomatis terkirim ke Cloud saat internet nyala kembali.</div>
+                <div class="faq-a">EduTrack punya fitur Sync Offline. Guru tetap bisa scan, dan data akan otomatis
+                    terkirim ke Cloud saat internet nyala kembali.</div>
             </div>
         </div>
     </section>
@@ -388,19 +399,47 @@
 
             <div style="margin-top:20px; padding:15px; border-top:1px solid #f1f5f9;">
                 <a href="parent/" class="parent-link">
-                    <i class="fas fa-user-shield"></i> Ayah, bunda, anak anda Sudah jadi murid? Pantau kehadiran anak di sini.
+                    <i class="fas fa-user-shield"></i> Ayah, bunda, anak anda Sudah jadi murid? Pantau kehadiran anak di
+                    sini.
                 </a>
             </div>
         </div>
     </footer>
 
     <script>
+        //FUNGSI PENGUMUMAN
+        // Fungsi untuk mengambil pengumuman dari database
+        async function fetchAnnouncement() {
+            try {
+                // Ambil baris pengumuman dari tabel 'site_settings' (atau nama tabel yang Sampeyan buat)
+                const { data, error } = await _supabase
+                    .from('site_settings')
+                    .select('content')
+                    .eq('key', 'landing_announcement')
+                    .single();
+
+                if (data && !error) {
+                    document.getElementById('announcement-text').innerHTML = data.content;
+                } else {
+                    // Fallback jika data tidak ketemu
+                    document.getElementById('announcement-text').innerText = "Fitur Jurnal Cloud & Anti-Double Scan sudah aktif!";
+                }
+            } catch (err) {
+                console.error("Gagal mengambil pengumuman:", err);
+            }
+        }
+
+        // Jalankan fungsi saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchAnnouncement();
+        });
+
         // FUNGSI FAQ (Baru)
         function toggleFAQ(element) {
             const answer = element.querySelector('.faq-a');
             const icon = element.querySelector('.fa-chevron-down');
             const isVisible = answer.style.display === 'block';
-            
+
             // Sembunyikan yang lain
             document.querySelectorAll('.faq-a').forEach(a => a.style.display = 'none');
             document.querySelectorAll('.fa-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
