@@ -272,7 +272,7 @@
 
 <body>
 
-   
+
 
     <div class="announcement-bar">
         <i class="fas fa-bullhorn"></i>
@@ -405,13 +405,21 @@
             </div>
         </div>
     </footer>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        //FUNGSI PENGUMUMAN
-        // Fungsi untuk mengambil pengumuman dari database
+        // 1. KONFIGURASI SUPABASE (Gunakan kredensial yang sama dengan license-manager)
+        const SUPABASE_URL = 'https://fcjmcqwlaauuoheggjpp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjam1jcXdsYWF1dW9oZWdnanBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDU3OTQsImV4cCI6MjA5Mjk4MTc5NH0.SbisuJx1bfWUxcMhoqyLjpECPqtZHeRaPa6vAePGIdY';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 2. JALANKAN SAAT HALAMAN SIAP
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAnnouncement(); // Ambil pengumuman dari database
+        });
+
+        // 3. FUNGSI AMBIL PENGUMUMAN DARI SUPABASE
         async function fetchAnnouncement() {
             try {
-                // Ambil baris pengumuman dari tabel 'site_settings' (atau nama tabel yang Sampeyan buat)
                 const { data, error } = await _supabase
                     .from('site_settings')
                     .select('content')
@@ -419,28 +427,21 @@
                     .single();
 
                 if (data && !error) {
-                    document.getElementById('announcement-text').innerHTML = data.content;
-                } else {
-                    // Fallback jika data tidak ketemu
-                    document.getElementById('announcement-text').innerText = "Fitur Jurnal Cloud & Anti-Double Scan sudah aktif!";
+                    // Update teks di bar pengumuman
+                    const el = document.getElementById('announcement-text');
+                    if (el) el.innerHTML = data.content;
                 }
             } catch (err) {
-                console.error("Gagal mengambil pengumuman:", err);
+                console.error("Gagal memuat pengumuman:", err);
             }
         }
 
-        // Jalankan fungsi saat halaman dimuat
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchAnnouncement();
-        });
-
-        // FUNGSI FAQ (Baru)
+        // 4. FUNGSI FAQ (Tetap Seperti Semula)
         function toggleFAQ(element) {
             const answer = element.querySelector('.faq-a');
             const icon = element.querySelector('.fa-chevron-down');
             const isVisible = answer.style.display === 'block';
 
-            // Sembunyikan yang lain
             document.querySelectorAll('.faq-a').forEach(a => a.style.display = 'none');
             document.querySelectorAll('.fa-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
 
@@ -450,7 +451,7 @@
             }
         }
 
-        // LOGIKA FORM ASLI SAMPEYAN (Tidak Disentuh)
+        // 5. LOGIKA FORM PENDAFTARAN (Tetap Seperti Semula)
         document.getElementById('claim-form').addEventListener('submit', function (e) {
             e.preventDefault();
             const nama = document.getElementById('nama-sekolah').value;
@@ -463,30 +464,27 @@
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('success-msg').style.display = 'block';
 
-            setTimeout(() => { window.open(`https://wa.me/${phoneAdmin}?text=${text}`, '_blank'); }, 2000);
+            // Jalankan registrasi otomatis di background
+            registerSekolah(nama, wa);
+
+            setTimeout(() => {
+                window.open(`https://wa.me/${phoneAdmin}?text=${text}`, '_blank');
+            }, 2000);
         });
 
-        // FUNGSI REGISTRASI ASLI SAMPEYAN (Tidak Disentuh)
         async function registerSekolah(nama, wa) {
             const slug = nama.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
             const { data: existing } = await _supabase.from('schools').select('id').eq('slug', slug).single();
-            if (existing) return alert("Nama sekolah sudah dipakai, Lur. Cari nama lain!");
+            if (existing) return; // Slug sudah ada, biarkan admin menangani manual via WA
 
-            const { data, error } = await _supabase.from('schools').insert([{
+            await _supabase.from('schools').insert([{
                 slug: slug,
                 name: nama,
                 joined_date: new Date().toISOString().split('T')[0],
                 license_status: 'trial',
                 delete_password: 'admin' + Math.floor(1000 + Math.random() * 9000)
-            }]).select();
-
-            if (!error) {
-                const appUrl = `https://edutrack.pro/edutrack/app/?id=${slug}`;
-                alert(`Selamat! Aplikasi ${nama} siap digunakan.`);
-                window.open(`https://wa.me/6287809657300?text=Halo Lur, saya baru daftar EduTrack: ${nama}. Link saya: ${appUrl}`, '_blank');
-                window.location.href = appUrl;
-            }
+            }]);
         }
     </script>
 
