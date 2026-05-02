@@ -347,6 +347,10 @@
                         <input type="tel" id="wa-user" placeholder="Contoh: 08123456789" required>
                     </div>
                     <div class="form-group">
+                        <label>Jumlah Guru/Tutor (Wajib)</label>
+                        <input type="number" id="jumlah-guru" placeholder="Contoh: 5" required min="1">
+                    </div>
+                    <div class="form-group">
                         <label>Upload Logo (Opsional)</label>
                         <input type="file" id="logo-file" accept="image/*" style="padding:10px;">
                     </div>
@@ -456,66 +460,70 @@
             e.preventDefault();
             const nama = document.getElementById('nama-sekolah').value;
             const wa = document.getElementById('wa-user').value;
-            const phoneAdmin = "6287809657300";
+            const jmlGuru = document.getElementById('jumlah-guru').value; // Ambil nilai jumlah guru
+            const phoneAdmin = "6281911009370"; // Nomor Sampeyan
 
-            const text = encodeURIComponent(`*PENDAFTARAN EDUTRACK BARU*\nInstitusi: ${nama}\nWA: ${wa}`);
+            const text = encodeURIComponent(`*PENDAFTARAN EDUTRACK BARU*\nInstitusi: ${nama}\nWA: ${wa}\nJml Guru: ${jmlGuru}`);
 
             document.getElementById('res-nama').innerText = nama;
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('success-msg').style.display = 'block';
 
-            // Jalankan registrasi otomatis di background
-            registerSekolah(nama, wa);
+            // Kirim ke database dengan parameter baru
+            registerSekolah(nama, wa, jmlGuru);
 
             setTimeout(() => {
                 window.open(`https://wa.me/${phoneAdmin}?text=${text}`, '_blank');
             }, 2000);
         });
 
-        async function registerSekolah(nama, wa) {
-            // Buat slug dari nama sekolah
+        // HAPUS fungsi yang lama, dan PAKAI yang ini saja satu-satunya:
+        async function registerSekolah(nama, wa, jmlGuru) {
+            // 1. Buat slug (ID unik) dari nama sekolah
             const slug = nama.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
-            console.log("Mengecek ketersediaan slug:", slug);
+            console.log("Proses registrasi untuk:", slug);
 
             try {
-                // 1. GUNAKAN .maybeSingle() agar tidak error 406 jika data tidak ditemukan
+                // 2. Cek apakah sekolah sudah pernah terdaftar (supaya tidak dobel)
                 const { data: existing, error: checkError } = await _supabase
                     .from('schools')
                     .select('id')
                     .eq('slug', slug)
-                    .maybeSingle();
+                    .maybeSingle(); // Pakai maybeSingle agar tidak error 406 kalau data kosong
 
                 if (checkError) {
-                    console.error("Error saat cek slug:", checkError.message);
+                    console.error("Gagal cek database:", checkError.message);
                     return;
                 }
 
                 if (existing) {
-                    console.warn("Sekolah sudah terdaftar, Lur. Tidak perlu insert lagi.");
+                    console.warn("Sekolah ini sudah ada di database, Lur.");
                     return;
                 }
 
-                // 2. Jika belum ada, baru kita Insert
-                console.log("Mendaftarkan sekolah baru ke Cloud...");
+                // 3. Masukkan data lengkap ke tabel 'schools'
                 const { data, error: insertError } = await _supabase
                     .from('schools')
                     .insert([{
                         slug: slug,
                         name: nama,
+                        teacher_count: parseInt(jmlGuru), // Data baru: Jumlah Guru
                         joined_date: new Date().toISOString().split('T')[0],
                         license_status: 'trial',
                         delete_password: 'admin' + Math.floor(1000 + Math.random() * 9000)
                     }]);
 
                 if (insertError) {
-                    console.error("Gagal simpan ke Cloud:", insertError.message);
+                    console.error("Gagal simpan data:", insertError.message);
                 } else {
-                    console.log("Sukses! Data Sanggar baru sudah masuk ke Supabase, Lur.");
+                    console.log("Joss! Data berhasil masuk ke Cloud.");
+                    // Setelah ini, panggil fungsi fetchAllSchools() agar daftar sekolah di bawah langsung update
+                    if (typeof fetchAllSchools === "function") fetchAllSchools();
                 }
 
             } catch (err) {
-                console.error("Fatal Error di fungsi registrasi:", err);
+                console.error("Error tidak terduga:", err);
             }
         }
     </script>
