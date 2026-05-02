@@ -79,88 +79,6 @@
             background: #000;
         }
 
-        /* STYLES TAMBAHAN (PENGUMUMAN, HOW TO, FAQ) */
-        .announcement-bar {
-            background: #fff3cd;
-            color: #856404;
-            padding: 15px 5%;
-            text-align: center;
-            font-size: 14px;
-            border-bottom: 1px solid #ffeeba;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-container {
-            max-width: 1100px;
-            margin: 60px auto;
-            padding: 0 20px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 40px;
-        }
-
-        .info-card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-            text-align: left;
-            position: relative;
-            transition: 0.3s;
-        }
-
-        .info-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-
-        .step-tag {
-            background: var(--primary);
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .faq-wrapper {
-            background: white;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            margin-top: 30px;
-        }
-
-        .faq-item {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 20px;
-            cursor: pointer;
-        }
-
-        .faq-item:last-child { border-bottom: none; }
-
-        .faq-q {
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .faq-a {
-            display: none;
-            padding-top: 15px;
-            color: #64748b;
-            font-size: 15px;
-        }
-
         /* Form Section */
         .cta-section {
             background: white;
@@ -267,11 +185,6 @@
 
 <body>
 
-    <div class="announcement-bar">
-        <i class="fas fa-bullhorn"></i>
-        <span><strong>Update Mei 2026:</strong> Fitur Jurnal Cloud & Anti-Double Scan sudah aktif untuk semua institusi!</span>
-    </div>
-
     <nav>
         <div class="logo">EduTrack.pro</div>
         <div><a href="#daftar" style="text-decoration:none; font-weight:bold; color:var(--primary)">Coba Gratis</a>
@@ -295,30 +208,6 @@
                 <source src="edutrack.mp4" type="video/mp4">
                 Browser Anda tidak mendukung tag video.
             </video>
-        </div>
-    </section>
-
-    <section class="section-container">
-        <div style="text-align: center;">
-            <h2 style="font-size: 32px; margin-bottom: 10px;">Bagaimana Cara Mulainya, Lur?</h2>
-            <p style="color: #64748b;">Hanya butuh 3 menit untuk mendigitalisasi institusi Anda.</p>
-        </div>
-        <div class="grid-3">
-            <div class="info-card">
-                <div class="step-tag">1</div>
-                <h3>Klaim Aplikasi</h3>
-                <p>Isi formulir pendaftaran di bawah. Sistem kami akan menyiapkan database khusus untuk sekolah Anda.</p>
-            </div>
-            <div class="info-card">
-                <div class="step-tag">2</div>
-                <h3>Aktivasi Branding</h3>
-                <p>Gunakan link yang dikirimkan, upload logo, dan aktifkan lisensi untuk membuka fitur Pro Cloud.</p>
-            </div>
-            <div class="info-card">
-                <div class="step-tag">3</div>
-                <h3>Mulai Operasional</h3>
-                <p>Cetak kartu QR siswa, guru mulai scan di kelas, dan wali murid bisa memantau secara real-time.</p>
-            </div>
         </div>
     </section>
 
@@ -361,26 +250,6 @@
         </div>
     </section>
 
-    <section class="section-container" style="margin-bottom: 100px;">
-        <div style="text-align: center;">
-            <h2 style="font-size: 32px; margin-bottom: 10px;">Pertanyaan Sering Muncul (FAQ)</h2>
-        </div>
-        <div class="faq-wrapper">
-            <div class="faq-item" onclick="toggleFAQ(this)">
-                <div class="faq-q">Apakah data saya aman di Cloud? <i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">Aman banget, Lur! EduTrack menggunakan enkripsi SSL dan database terpisah untuk setiap institusi. Data Anda tidak akan tertukar atau hilang.</div>
-            </div>
-            <div class="faq-item" onclick="toggleFAQ(this)">
-                <div class="faq-q">Apakah orang tua perlu download aplikasi? <i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">Tidak perlu. Orang tua cukup akses portal lewat browser HP (PWA). Simpel dan tidak bikin memori HP penuh.</div>
-            </div>
-            <div class="faq-item" onclick="toggleFAQ(this)">
-                <div class="faq-q">Bagaimana jika internet di sekolah mati? <i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">EduTrack punya fitur Sync Offline. Guru tetap bisa scan, dan data akan otomatis terkirim ke Cloud saat internet nyala kembali.</div>
-            </div>
-        </div>
-    </section>
-
     <footer style="padding:60px 20px; text-align:center; background:#fff; border-top:1px solid #e2e8f0;">
         <div style="max-width:1200px; margin:auto;">
             <div class="logo" style="margin-bottom:10px;">EduTrack.pro</div>
@@ -395,23 +264,6 @@
     </footer>
 
     <script>
-        // FUNGSI FAQ (Baru)
-        function toggleFAQ(element) {
-            const answer = element.querySelector('.faq-a');
-            const icon = element.querySelector('.fa-chevron-down');
-            const isVisible = answer.style.display === 'block';
-            
-            // Sembunyikan yang lain
-            document.querySelectorAll('.faq-a').forEach(a => a.style.display = 'none');
-            document.querySelectorAll('.fa-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
-
-            if (!isVisible) {
-                answer.style.display = 'block';
-                icon.style.transform = 'rotate(180deg)';
-            }
-        }
-
-        // LOGIKA FORM ASLI SAMPEYAN (Tidak Disentuh)
         document.getElementById('claim-form').addEventListener('submit', function (e) {
             e.preventDefault();
             const nama = document.getElementById('nama-sekolah').value;
@@ -426,27 +278,27 @@
 
             setTimeout(() => { window.open(`https://wa.me/${phoneAdmin}?text=${text}`, '_blank'); }, 2000);
         });
-
-        // FUNGSI REGISTRASI ASLI SAMPEYAN (Tidak Disentuh)
         async function registerSekolah(nama, wa) {
             const slug = nama.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
+            // 1. Cek dulu apakah slug sudah dipakai
             const { data: existing } = await _supabase.from('schools').select('id').eq('slug', slug).single();
             if (existing) return alert("Nama sekolah sudah dipakai, Lur. Cari nama lain!");
 
+            // 2. Insert ke Supabase otomatis
             const { data, error } = await _supabase.from('schools').insert([{
                 slug: slug,
                 name: nama,
                 joined_date: new Date().toISOString().split('T')[0],
                 license_status: 'trial',
-                delete_password: 'admin' + Math.floor(1000 + Math.random() * 9000)
+                delete_password: 'admin' + Math.floor(1000 + Math.random() * 9000) // Password acak
             }]).select();
 
             if (!error) {
                 const appUrl = `https://edutrack.pro/edutrack/app/?id=${slug}`;
                 alert(`Selamat! Aplikasi ${nama} siap digunakan.`);
                 window.open(`https://wa.me/6287809657300?text=Halo Lur, saya baru daftar EduTrack: ${nama}. Link saya: ${appUrl}`, '_blank');
-                window.location.href = appUrl;
+                window.location.href = appUrl; // Langsung arahkan ke app mereka
             }
         }
     </script>
