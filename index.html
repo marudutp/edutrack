@@ -84,7 +84,8 @@
             align-items: center;
             gap: 12px;
             margin: 0 40px;
-            filter: grayscale(100%); /* Efek abu-abu sesuai request */
+            filter: grayscale(100%);
+            /* Efek abu-abu sesuai request */
             opacity: 0.6;
             transition: 0.3s;
         }
@@ -101,8 +102,13 @@
         }
 
         @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
         }
 
         /* Video Mockup Styling */
@@ -277,9 +283,19 @@
         }
 
         @media (max-width: 900px) {
-            .hero { grid-template-columns: 1fr; text-align: center; padding: 40px 20px; }
-            .hero-text h1 { font-size: 36px; }
-            .mockup-container { margin-top: 40px; }
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding: 40px 20px;
+            }
+
+            .hero-text h1 {
+                font-size: 36px;
+            }
+
+            .mockup-container {
+                margin-top: 40px;
+            }
         }
     </style>
 </head>
@@ -293,13 +309,15 @@
 
     <nav>
         <div class="logo">EduTrack.pro</div>
-        <div><a href="#daftar" style="text-decoration:none; font-weight:bold; color:var(--primary)">Coba Gratis</a></div>
+        <div><a href="#daftar" style="text-decoration:none; font-weight:bold; color:var(--primary)">Coba Gratis</a>
+        </div>
     </nav>
 
     <section class="hero">
         <div class="hero-text">
             <h1>Absensi Digital & Jurnal Guru dalam Satu Genggaman.</h1>
-            <p>Beri transparansi belajar ke orang tua murid dengan sistem QR-Scan yang simpel dan profesional. Tanpa instalasi, langsung pakai!</p>
+            <p>Beri transparansi belajar ke orang tua murid dengan sistem QR-Scan yang simpel dan profesional. Tanpa
+                instalasi, langsung pakai!</p>
             <ul style="list-style:none; padding:0; color:#475569; margin-bottom:30px;">
                 <li><i class="fas fa-check-circle" style="color:var(--primary)"></i> Kartu ID Siswa Otomatis</li>
                 <li><i class="fas fa-check-circle" style="color:var(--primary)"></i> Jurnal Progres Real-Time</li>
@@ -319,7 +337,7 @@
     </div>
     <div class="logo-slider">
         <div class="logo-track" id="client-logos">
-            </div>
+        </div>
     </div>
 
     <section class="section-container">
@@ -331,7 +349,8 @@
             <div class="info-card">
                 <div class="step-tag">1</div>
                 <h3>Klaim Aplikasi</h3>
-                <p>Isi formulir pendaftaran di bawah. Sistem kami akan menyiapkan database khusus untuk sekolah Anda.</p>
+                <p>Isi formulir pendaftaran di bawah. Sistem kami akan menyiapkan database khusus untuk sekolah Anda.
+                </p>
             </div>
             <div class="info-card">
                 <div class="step-tag">2</div>
@@ -359,7 +378,7 @@
                         <label>Nomor WhatsApp (Aktif)</label>
                         <input type="tel" id="wa-user" placeholder="Contoh: 08123456789" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label>Jumlah Guru/Tutor (Wajib)</label>
                         <input type="number" id="jumlah-guru" placeholder="Contoh: 5" required min="1">
@@ -382,17 +401,30 @@
                 <p style="background:#f0fdf4; padding:15px; border-radius:12px; color:#166534;">
                     Link akses akan dikirimkan ke WhatsApp Anda dalam <strong>5 menit</strong>.
                 </p>
-                <button onclick="window.location.reload()" class="btn-cta" style="background:#64748b; margin-top:20px;">Kembali</button>
+                <button onclick="window.location.reload()" class="btn-cta"
+                    style="background:#64748b; margin-top:20px;">Kembali</button>
             </div>
         </div>
     </section>
 
     <section class="section-container" style="margin-bottom: 100px;">
-        <div style="text-align: center;"><h2 style="font-size: 32px; margin-bottom: 10px;">FAQ</h2></div>
+        <div style="text-align: center;">
+            <h2 style="font-size: 32px; margin-bottom: 10px;">FAQ</h2>
+        </div>
         <div class="faq-wrapper">
             <div class="faq-item" onclick="toggleFAQ(this)">
                 <div class="faq-q">Apakah data saya aman di Cloud? <i class="fas fa-chevron-down"></i></div>
                 <div class="faq-a">Aman banget, Lur! EduTrack menggunakan enkripsi SSL dan database terpisah.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-q">Apakah orang tua perlu download aplikasi? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">Tidak perlu. Orang tua cukup akses portal lewat browser HP (PWA). Simpel dan tidak
+                    bikin memori HP penuh.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-q">Bagaimana jika internet di sekolah mati? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">EduTrack punya fitur Sync Offline. Guru tetap bisa scan, dan data akan otomatis
+                    terkirim ke Cloud saat internet nyala kembali.</div>
             </div>
         </div>
     </section>
@@ -400,7 +432,8 @@
     <footer style="padding:60px 20px; text-align:center; background:#fff; border-top:1px solid #e2e8f0;">
         <div class="logo">EduTrack.pro</div>
         <p style="color:#94a3b8; font-size:14px;">&copy; 2026 EduTrack.pro by Imarucubes Studios.</p>
-        <div style="margin-top:20px;"><a href="parent/" class="parent-link"><i class="fas fa-user-shield"></i> Portal Orang Tua</a></div>
+        <div style="margin-top:20px;"><a href="parent/" class="parent-link"><i class="fas fa-user-shield"></i> Portal
+                Orang Tua</a></div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -479,4 +512,5 @@
         }
     </script>
 </body>
+
 </html>
