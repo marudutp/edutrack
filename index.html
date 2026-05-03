@@ -445,6 +445,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchAnnouncement();
             fetchClientLogos(); // Fungsi untuk slider logo
+            trackVisitor(); // <--- TAMBAHKAN INI
         });
 
         async function fetchAnnouncement() {
@@ -470,6 +471,30 @@
             } catch (err) { console.error(err); }
         }
 
+        async function trackVisitor() {
+            try {
+                // 1. Ambil alamat IP dari layanan pihak ketiga (gratis)
+                const response = await fetch('https://api.ipify.org?format=json');
+                const { ip } = await response.json();
+
+                // 2. Tangkap informasi dari URL (untuk tracking iklan)
+                // Contoh link iklan: edutrack.pro?utm_source=facebook
+                const urlParams = new URLSearchParams(window.location.search);
+                const source = urlParams.get('utm_source') || 'direct'; // default 'direct' kalau bukan dari iklan
+
+                // 3. Masukkan ke Supabase
+                await _supabase.from('visitor_logs').insert([{
+                    ip_address: ip,
+                    user_agent: navigator.userAgent,
+                    referrer: document.referrer || 'none',
+                    utm_source: source
+                }]);
+
+                console.log("Visitor tracked:", source);
+            } catch (err) {
+                console.error("Gagal melacak visitor:", err);
+            }
+        }
         function toggleFAQ(element) {
             const answer = element.querySelector('.faq-a');
             const isVisible = answer.style.display === 'block';
@@ -482,7 +507,7 @@
             const nama = document.getElementById('nama-sekolah').value;
             const wa = document.getElementById('wa-user').value;
             const jmlGuru = document.getElementById('jumlah-guru').value; // Ambil nilai jumlah guru
-            const phoneAdmin = "6287809657300";
+            const phoneAdmin = "6281911009370";
 
             const text = encodeURIComponent(`*PENDAFTARAN EDUTRACK BARU*\nInstitusi: ${nama}\nWA: ${wa}\nJumlah Guru: ${jmlGuru}`);
 
@@ -504,6 +529,7 @@
                 slug: slug,
                 name: nama,
                 teacher_count: parseInt(jmlGuru), // Masukkan jumlah guru ke DB
+                flag: 'R', // <--- OTOMATIS JADI REAL
                 joined_date: new Date().toISOString().split('T')[0],
                 license_status: 'trial',
                 delete_password: 'admin' + Math.floor(1000 + Math.random() * 9000)
