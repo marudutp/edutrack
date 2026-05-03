@@ -472,27 +472,39 @@
         }
 
         async function trackVisitor() {
+            console.log("Agen Intel: Mulai melacak..."); // Cek di F12
             try {
-                // 1. Ambil alamat IP dari layanan pihak ketiga (gratis)
-                const response = await fetch('https://api.ipify.org?format=json');
-                const { ip } = await response.json();
+                let userIp = 'Unknown';
 
-                // 2. Tangkap informasi dari URL (untuk tracking iklan)
-                // Contoh link iklan: edutrack.pro?utm_source=facebook
+                // Coba ambil IP, kalau gagal (karena Adblock/Internet), lanjut terus
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json');
+                    const data = await res.json();
+                    userIp = data.ip;
+                } catch (e) {
+                    console.log("Agen Intel: Gagal ambil IP, lanjut pake 'Unknown'");
+                }
+
                 const urlParams = new URLSearchParams(window.location.search);
-                const source = urlParams.get('utm_source') || 'direct'; // default 'direct' kalau bukan dari iklan
+                const source = urlParams.get('utm_source') || 'direct';
 
-                // 3. Masukkan ke Supabase
-                await _supabase.from('visitor_logs').insert([{
-                    ip_address: ip,
+                console.log("Agen Intel: Mengirim laporan untuk sumber:", source);
+
+                // Masukkan ke Supabase
+                const { error } = await _supabase.from('visitor_logs').insert([{
+                    ip_address: userIp,
                     user_agent: navigator.userAgent,
                     referrer: document.referrer || 'none',
                     utm_source: source
                 }]);
 
-                console.log("Visitor tracked:", source);
+                if (error) {
+                    console.error("Agen Intel: Laporan ditolak Supabase!", error.message);
+                } else {
+                    console.log("Agen Intel: Laporan BERHASIL masuk ke Cloud!");
+                }
             } catch (err) {
-                console.error("Gagal melacak visitor:", err);
+                console.error("Agen Intel: Error Fatal!", err);
             }
         }
         function toggleFAQ(element) {
