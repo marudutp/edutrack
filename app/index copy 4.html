@@ -69,7 +69,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 850px;
             margin: auto;
             display: none;
         }
@@ -136,14 +136,12 @@
             position: sticky;
             top: 0;
             border-bottom: 2px solid #eee;
-            font-size: 13px;
         }
 
         td {
-            padding: 12px 15px;
+            padding: 15px;
             border-bottom: 1px solid #eee;
             text-align: left;
-            font-size: 14px;
         }
 
         .input-style {
@@ -173,18 +171,6 @@
             display: none;
             margin-top: 15px;
             border: 2px solid var(--primary);
-        }
-
-        /* Badge Pertemuan */
-        .badge-meeting {
-            background: #e0f2fe;
-            color: #0369a1;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 11px;
-            display: inline-block;
-            white-space: nowrap;
         }
     </style>
 </head>
@@ -219,10 +205,7 @@
         <div class="search-card" style="margin-top: 20px;">
             <h3><i class="fas fa-id-card"></i> ID Card Generator</h3>
             <input type="text" id="inputNama" placeholder="Nama Lengkap Siswa..." class="input-style">
-            
-            <input type="text" id="inputJoinDate" placeholder="Join Date Siswa" 
-                onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" class="input-style">
-            
+            <input type="date" id="inputJoinDate" class="input-style">
             <button onclick="generateIDCard()"
                 style="width:100%; padding: 15px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">BUAT
                 KARTU</button>
@@ -261,17 +244,12 @@
                 style="flex: 2; background:var(--success); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">
                 <i class="fas fa-camera"></i> MULAI SCAN
             </button>
-            <button id="gallery-btn" onclick="document.getElementById('qr-input-file').click()"
-                style="flex: 1; background:var(--info); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">
-                <i class="fas fa-image"></i> GALERI
-            </button>
             <button id="stop-btn" onclick="stopScanner()"
                 style="flex: 1; background:var(--danger); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:none;">
                 <i class="fas fa-times"></i> TUTUP
             </button>
         </div>
 
-        <input type="file" id="qr-input-file" accept="image/*" style="display:none">
         <div id="reader"></div>
 
         <div style="margin-top: 20px;">
@@ -284,8 +262,7 @@
                 <thead>
                     <tr>
                         <th>Nama Siswa</th>
-                        <th style="width: 100px;">Pertemuan</th>
-                        <th style="width: 110px;">Waktu</th>
+                        <th>Waktu</th>
                         <th>Catatan Jurnal</th>
                     </tr>
                 </thead>
@@ -297,6 +274,8 @@
     <script>
         let html5QrCode;
         let schoolUUID = null;
+
+        // FITUR 2: LOGIKA ANTI DOUBLE-SCAN
         let lastScannedData = null;
         let lastScannedTime = 0;
 
@@ -318,54 +297,42 @@
             }
         });
 
-        // PROSES SCAN (Anti Double-Scan)
-        function processQrResult(text) {
-            const now = Date.now();
-            if (text === lastScannedData && (now - lastScannedTime) < 5000) {
-                console.log("Data sama, abaikan lur...");
-                return;
-            }
-            lastScannedData = text;
-            lastScannedTime = now;
-            saveDataCloud(text);
-        }
-
-        // KONTROL SCANNER
+        // FITUR 3: FUNGSI STOP SCANNER
         async function stopScanner() {
             if (html5QrCode) {
-                try { await html5QrCode.stop(); } catch (e) {}
+                await html5QrCode.stop();
                 document.getElementById('reader').style.display = 'none';
                 document.getElementById('start-btn').style.display = 'block';
-                document.getElementById('gallery-btn').style.display = 'block';
                 document.getElementById('stop-btn').style.display = 'none';
             }
         }
 
         async function startScanner() {
             document.getElementById('start-btn').style.display = 'none';
-            document.getElementById('gallery-btn').style.display = 'none';
             document.getElementById('stop-btn').style.display = 'block';
             document.getElementById('reader').style.display = 'block';
-            if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+
+            html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, (text) => {
-                processQrResult(text);
+
+                // FITUR 2: CEK DOUBLE SCAN (Cooldown 5 detik untuk data yang sama)
+                const now = Date.now();
+                if (text === lastScannedData && (now - lastScannedTime) < 5000) {
+                    console.log("Data sama, abaikan lur...");
+                    return;
+                }
+
+                lastScannedData = text;
+                lastScannedTime = now;
+
+                saveDataCloud(text);
             }).catch(err => {
                 alert("Kamera Error, Lur!");
                 stopScanner();
             });
         }
 
-        // SCAN DARI GALERI
-        document.getElementById('qr-input-file').addEventListener('change', e => {
-            if (e.target.files.length === 0) return;
-            const imageFile = e.target.files[0];
-            if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.scanFile(imageFile, true)
-                .then(text => { processQrResult(text); alert("Berhasil baca dari galeri, Lur!"); })
-                .catch(err => { alert("QR Code gak kebaca, Lur!"); });
-        });
-
-        // FILTER PENCARIAN
+        // FITUR 1: FUNGSI CARI SISWA
         function filterJurnal() {
             const input = document.getElementById('search-jurnal').value.toLowerCase();
             const rows = document.querySelectorAll('#historyBody tr');
@@ -375,68 +342,38 @@
             });
         }
 
-        // TAMPILKAN TABEL JURNAL (Mendukung kolom Pertemuan & Textarea)
         async function renderTable() {
             if (!schoolUUID) return;
             const { data: logs, error } = await _supabase.from('attendance_logs').select('*')
                 .eq('school_id', schoolUUID).order('created_at', { ascending: false });
 
             if (!error) {
-                document.getElementById('historyBody').innerHTML = logs.map(i => {
-                    const currentNote = i.note || '';
-                    const remaining = 150 - currentNote.length;
-                    return `
+                document.getElementById('historyBody').innerHTML = logs.map(i => `
                 <tr>
-                    <td style="vertical-align: top;"><strong>${i.student_info}</strong></td>
-                    <td style="vertical-align: top;"><span class="badge-meeting">Ke-${i.meeting_number || '1'}</span></td>
-                    <td style="vertical-align: top; font-size:11px; color:#666;">${new Date(i.created_at).toLocaleString('id-ID')}</td>
+                    <td><strong>${i.student_info}</strong></td>
+                    <td style="font-size:12px; color:#666;">${new Date(i.created_at).toLocaleString('id-ID')}</td>
                     <td>
-                        <div style="display:flex; flex-direction:column; gap:5px; min-width: 220px;">
-                            <textarea id="note-${i.id}" maxlength="150" oninput="updateCharCount(${i.id}, this)"
-                                style="width: 100%; border:1px solid #ddd; padding:8px; border-radius:8px; resize: none; font-family: inherit; font-size: 13px; box-sizing: border-box;"
-                                rows="3" placeholder="Tulis jurnal...">${currentNote}</textarea>
-                            <div style="display:flex; justify-content: space-between; align-items: center;">
-                                <small style="color: #888; font-size: 10px;">Sisa: <span id="count-${i.id}">${remaining}</span></small>
-                                <button onclick="saveNoteCloud(${i.id})" 
-                                    style="background:var(--success); color:white; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size: 11px; font-weight: bold;">
-                                    <i class="fas fa-save"></i> SIMPAN
-                                </button>
-                            </div>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="note-${i.id}" value="${i.note || ''}" placeholder="Notes..." style="flex:1; border:1px solid #ddd; padding:5px; border-radius:5px;">
+                            <button onclick="saveNoteCloud(${i.id})" style="background:var(--success); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;"><i class="fas fa-save"></i></button>
                         </div>
                     </td>
-                </tr>`}).join('');
+                </tr>`).join('');
             }
         }
 
-        // HITUNG KARAKTER JURNAL
-        function updateCharCount(id, el) {
-            const remaining = 150 - el.value.length;
-            const counterEl = document.getElementById(`count-${id}`);
-            if (counterEl) {
-                counterEl.innerText = remaining;
-                counterEl.style.color = remaining <= 10 ? "red" : "#888";
-            }
-        }
-
-        // SIMPAN KE CLOUD (Trigger di Supabase sudah menangani meeting_number)
         async function saveDataCloud(val) {
-            const { error } = await _supabase.from('attendance_logs').insert([{ 
-                school_id: schoolUUID, 
-                student_info: val 
-            }]);
-            
+            const { error } = await _supabase.from('attendance_logs').insert([{ school_id: schoolUUID, student_info: val }]);
             if (!error) { renderTable(); beep(); }
-            else { console.error("Cloud Save Error:", error); }
         }
 
-        // SIMPAN NOTES JURNAL
         async function saveNoteCloud(logId) {
             const noteVal = document.getElementById(`note-${logId}`).value;
             const { error } = await _supabase.from('attendance_logs').update({ note: noteVal }).eq('id', logId);
-            if (!error) alert("Notes Jurnal Tersimpan!");
+            if (!error) alert("Notes Tersimpan!");
         }
 
-        // KARTU ID GENERATOR
+        // --- FUNGSI GENERATOR KARTU (TETAP SAMA) ---
         function generateIDCard() {
             const nama = document.getElementById('inputNama').value.trim();
             const join = document.getElementById('inputJoinDate').value;
@@ -449,10 +386,14 @@
             new QRCode(document.getElementById("qrcode"), { text: `${clientId}-${nama}`, width: 160, height: 160 });
         }
 
-        // DOWNLOAD PNG
+        // 1. FUNGSI SIMPAN PNG (Tetap joss, saya optimasi skalanya)
         function downloadCard() {
             const card = document.getElementById("printableCard");
-            html2canvas(card, { scale: 3, useCORS: true }).then(canvas => {
+            html2canvas(card, {
+                scale: 3, // Biar hasil gambar tajam/HD
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
                 const link = document.createElement("a");
                 link.download = `ID-${document.getElementById('displayNama').innerText}.png`;
                 link.href = canvas.toDataURL("image/png");
@@ -460,44 +401,87 @@
             });
         }
 
-        // CETAK KARTU
+        // 2. FUNGSI CETAK (Sekarang pakai sistem Image-to-Print agar presisi)
         function printCard() {
             const card = document.getElementById("printableCard");
+
             html2canvas(card, { scale: 2, useCORS: true }).then(canvas => {
                 const imgData = canvas.toDataURL("image/png");
                 const win = window.open('', '_blank');
-                win.document.write(`<html><body onload="window.print(); window.close();"><img src="${imgData}" style="width:320px;"/></body></html>`);
+
+                win.document.write(`
+            <html>
+            <head>
+                <title>Cetak Kartu - EduTrack</title>
+                <style>
+                    body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+                    img { width: 320px; height: auto; } /* Sesuaikan ukuran kartu */
+                    @media print {
+                        body { margin: 0; }
+                        img { width: 80mm; height: auto; } /* Ukuran standar kartu nama */
+                    }
+                </style>
+            </head>
+            <body onload="window.print(); window.close();">
+                <img src="${imgData}" />
+            </body>
+            </html>
+        `);
                 win.document.close();
             });
         }
 
-        // SHARE WHATSAPP
+        // 3. FUNGSI SHARE (Sekarang bisa kirim GAMBAR di HP)
         async function shareWA() {
             const nama = document.getElementById('displayNama').innerText;
             const card = document.getElementById("printableCard");
-            try {
-                const canvas = await html2canvas(card, { scale: 2, useCORS: true });
-                const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-                const file = new File([blob], `ID-${nama}.png`, { type: 'image/png' });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: `ID Card`, text: `Halo ${nama}, ini kartu EduTrack kamu.` });
-                } else {
-                    window.open(`https://wa.me/?text=${encodeURIComponent('Halo ' + nama + ', ini kartu EduTrack kamu.')}`, '_blank');
+
+            // Cek apakah browser mendukung fitur Share File (Navigator Share)
+            if (navigator.share && navigator.canShare) {
+                try {
+                    const canvas = await html2canvas(card, { scale: 2, useCORS: true });
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    const file = new File([blob], `ID-${nama}.png`, { type: 'image/png' });
+
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: `Kartu EduTrack ${nama}`,
+                            text: `Halo, ini Kartu Identitas EduTrack untuk *${nama}*.`
+                        });
+                    } else {
+                        throw new Error("Browser tidak mendukung share file.");
+                    }
+                } catch (err) {
+                    // Fallback ke WhatsApp Web (Hanya Teks) jika gagal/tidak didukung
+                    const pesan = encodeURIComponent(`Halo, ini Kartu Identitas EduTrack untuk *${nama}*. Silakan simpan gambar kartu Anda.`);
+                    window.open(`https://wa.me/?text=${pesan}`, '_blank');
                 }
-            } catch (e) { alert("Gagal share."); }
+            } else {
+                // Fallback untuk Browser PC / Lama
+                const pesan = encodeURIComponent(`Halo, ini Kartu Identitas EduTrack untuk *${nama}*. (Saran: Download PNG lalu lampirkan di WA)`);
+                window.open(`https://wa.me/?text=${pesan}`, '_blank');
+            }
         }
 
-        // SYNC DATA LAMA (Local Storage)
         async function syncDataLama() {
+            const namaSekolah = (window.schoolData && window.schoolData.name) ? window.schoolData.name : "Sekolah";
             let keyDinamis = `logs_${clientId}`;
             let localLogs = JSON.parse(localStorage.getItem(keyDinamis)) || [];
-            if (localLogs.length === 0) return alert(`Nggak ada data lama.`);
+            if (clientId === 'sda-music' && localLogs.length === 0) {
+                localLogs = JSON.parse(localStorage.getItem('sda_logs')) || [];
+            }
+            if (localLogs.length === 0) return alert(`Nggak ada data lama untuk ${namaSekolah}.`);
             const cloudReady = localLogs.map(l => ({ school_id: schoolUUID, student_info: l.info, note: l.note || '', created_at: l.ts }));
             const { error } = await _supabase.from('attendance_logs').insert(cloudReady);
-            if (!error) { alert("Sinkronisasi Berhasil!"); renderTable(); localStorage.removeItem(keyDinamis); }
+            if (!error) {
+                alert("Sinkronisasi Berhasil!");
+                localStorage.removeItem(keyDinamis);
+                if (clientId === 'sda-music') localStorage.removeItem('sda_logs');
+                renderTable();
+            }
         }
 
-        // BEEP SOUND
         function beep() {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = ctx.createOscillator(); const gain = ctx.createGain();
