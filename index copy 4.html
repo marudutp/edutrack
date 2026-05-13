@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack.pro - Digital Management untuk Kursus & Hobi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #007bff;
+            --dark: #1e293b;
+            --accent: #06b6d4;
+            --light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 80px 10px;
+            align-items: center;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .hero-text h1 {
+            font-size: 48px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        /* CSS untuk Logo Slider Dinamis (KLIEN KAMI) */
+        .logo-slider {
+            overflow: hidden;
+            padding: 40px 0;
+            background: white;
+            white-space: nowrap;
+            position: relative;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo-track {
+            display: inline-flex;
+            animation: scroll 40s linear infinite;
+        }
+
+        .logo-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 40px;
+            filter: grayscale(100%);
+            /* Efek abu-abu sesuai request */
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .logo-item:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+
+        .logo-item span {
+            font-weight: 800;
+            font-size: 20px;
+            color: #475569;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Video Mockup Styling */
+        .mockup-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mockup-video {
+            width: 100%;
+            max-width: 320px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            border: 8px solid #334155;
+            background: #000;
+        }
+
+        .announcement-bar {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px 5%;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid #ffeeba;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-container {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .step-tag {
+            background: var(--primary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .faq-wrapper {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            margin-top: 30px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .faq-q {
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-a {
+            display: none;
+            padding-top: 15px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        /* Form Section */
+        .cta-section {
+            background: white;
+            padding: 60px 5%;
+            border-radius: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 40px auto;
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        .btn-cta {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-cta:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .parent-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        #success-msg {
+            display: none;
+            text-align: center;
+        }
+
+        .check-icon {
+            font-size: 60px;
+            color: #22c55e;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding: 40px 20px;
+            }
+
+            .hero-text h1 {
+                font-size: 36px;
+            }
+
+            .mockup-container {
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="announcement-bar">
+        <i class="fas fa-bullhorn"></i>
+        <span id="announcement-text">Memuat informasi terbaru...</span>
+    </div>
+
+    <nav>
+        <div class="logo">EduTrack.pro</div>
+        <div><a href="#daftar" style="text-decoration:none; font-weight:bold; color:var(--primary)">Coba Gratis</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Absensi Digital & Jurnal Guru dalam Satu Genggaman.</h1>
+            <p>Beri transparansi belajar ke orang tua murid dengan sistem QR-Scan yang simpel dan profesional. Tanpa
+                instalasi, langsung pakai!</p>
+            <ul style="list-style:none; padding:0; color:#475569; margin-bottom:30px;">
+                <li><i class="fas fa-check-circle" style="color:var(--primary)"></i> Kartu ID Siswa Otomatis</li>
+                <li><i class="fas fa-check-circle" style="color:var(--primary)"></i> Jurnal Progres Real-Time</li>
+                <li><i class="fas fa-check-circle" style="color:var(--primary)"></i> Laporan CSV dalam Sekali Klik</li>
+            </ul>
+        </div>
+
+        <div class="mockup-container">
+            <video autoplay loop muted playsinline class="mockup-video">
+                <source src="edutrack.mp4" type="video/mp4">
+            </video>
+        </div>
+    </section>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8;">Klien Kami</h2>
+    </div>
+    <div class="logo-slider">
+        <div class="logo-track" id="client-logos">
+        </div>
+    </div>
+
+    <section class="section-container">
+        <div style="text-align: center;">
+            <h2 style="font-size: 32px; margin-bottom: 10px;">Bagaimana Cara Mulainya, Lur?</h2>
+            <p style="color: #64748b;">Hanya butuh 3 menit untuk mendigitalisasi institusi Anda.</p>
+        </div>
+        <div class="grid-3">
+            <div class="info-card">
+                <div class="step-tag">1</div>
+                <h3>Klaim Aplikasi</h3>
+                <p>Isi formulir pendaftaran di bawah. Sistem kami akan menyiapkan database khusus untuk sekolah Anda.
+                </p>
+            </div>
+            <div class="info-card">
+                <div class="step-tag">2</div>
+                <h3>Aktivasi Branding</h3>
+                <p>Gunakan link yang dikirimkan, upload logo, dan aktifkan lisensi untuk membuka fitur Pro Cloud.</p>
+            </div>
+            <div class="info-card">
+                <div class="step-tag">3</div>
+                <h3>Mulai Operasional</h3>
+                <p>Cetak kartu QR siswa, guru mulai scan di kelas, dan wali murid bisa memantau secara real-time.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="daftar">
+        <div class="cta-section">
+            <div id="form-container">
+                <h2 style="text-align:center; margin-top:0">Dapatkan Versi Freemium</h2>
+                <form id="claim-form">
+                    <div class="form-group">
+                        <label>Nama Institusi / Kursus</label>
+                        <input type="text" id="nama-sekolah" placeholder="Contoh: Sanggar Musik Merdeka" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor WhatsApp (Aktif)</label>
+                        <input type="tel" id="wa-user" placeholder="Contoh: 08123456789" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jumlah Guru/Tutor (Wajib)</label>
+                        <input type="number" id="jumlah-guru" placeholder="Contoh: 5" required min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Logo (Opsional)</label>
+                        <input type="file" id="logo-file" accept="image/*" style="padding:10px;">
+                    </div>
+                    <button type="submit" class="btn-cta">
+                        Siapkan Aplikasi Saya <i class="fas fa-rocket"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div id="success-msg">
+                <i class="fas fa-circle-check check-icon"></i>
+                <h2>Terima Kasih, Lur!</h2>
+                <p>Data institusi <strong><span id="res-nama">-</span></strong> sudah kami terima.</p>
+                <p style="background:#f0fdf4; padding:15px; border-radius:12px; color:#166534;">
+                    Link akses akan dikirimkan ke WhatsApp Anda dalam <strong>5 menit</strong>.
+                </p>
+                <button onclick="window.location.reload()" class="btn-cta"
+                    style="background:#64748b; margin-top:20px;">Kembali</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-container" style="margin-bottom: 100px;">
+        <div style="text-align: center;">
+            <h2 style="font-size: 32px; margin-bottom: 10px;">FAQ</h2>
+        </div>
+        <div class="faq-wrapper">
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-q">Apakah data saya aman di Cloud? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">Aman banget, Lur! EduTrack menggunakan enkripsi SSL dan database terpisah.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-q">Apakah orang tua perlu download aplikasi? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">Tidak perlu. Orang tua cukup akses portal lewat browser HP (PWA). Simpel dan tidak
+                    bikin memori HP penuh.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-q">Bagaimana jika internet di sekolah mati? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">EduTrack punya fitur Sync Offline. Guru tetap bisa scan, dan data akan otomatis
+                    terkirim ke Cloud saat internet nyala kembali.</div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="padding:60px 20px; text-align:center; background:#fff; border-top:1px solid #e2e8f0;">
+        <div class="logo">EduTrack.pro</div>
+        <p style="color:#94a3b8; font-size:14px;">&copy; 2026 EduTrack.pro by Imarucubes Studios.</p>
+        <div style="margin-top:20px;"><a href="parent/" class="parent-link"><i class="fas fa-user-shield"></i> Portal
+                Orang Tua</a></div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://fcjmcqwlaauuoheggjpp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjam1jcXdsYWF1dW9oZWdnanBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDU3OTQsImV4cCI6MjA5Mjk4MTc5NH0.SbisuJx1bfWUxcMhoqyLjpECPqtZHeRaPa6vAePGIdY';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAnnouncement();
+            fetchClientLogos(); // Fungsi untuk slider logo
+            trackVisitor(); // <--- TAMBAHKAN INI
+        });
+
+        async function fetchAnnouncement() {
+            try {
+                const { data } = await _supabase.from('site_settings').select('content').eq('key', 'landing_announcement').single();
+                if (data) document.getElementById('announcement-text').innerHTML = data.content;
+            } catch (err) { console.error(err); }
+        }
+
+        async function fetchClientLogos() {
+            const track = document.getElementById('client-logos');
+            try {
+                const { data: schools } = await _supabase.from('schools').select('name, logo_url').limit(15);
+                if (schools && schools.length > 0) {
+                    const list = [...schools, ...schools]; // Rahasia infinite loop
+                    track.innerHTML = list.map(s => `
+                        <div class="logo-item">
+                            <i class="fas fa-school" style="font-size:20px;"></i>
+                            <span>${s.name}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function trackVisitor() {
+            console.log("Agen Intel: Mulai melacak..."); // Cek di F12
+            try {
+                let userIp = 'Unknown';
+
+                // Coba ambil IP, kalau gagal (karena Adblock/Internet), lanjut terus
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json');
+                    const data = await res.json();
+                    userIp = data.ip;
+                } catch (e) {
+                    console.log("Agen Intel: Gagal ambil IP, lanjut pake 'Unknown'");
+                }
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const source = urlParams.get('utm_source') || 'direct';
+
+                console.log("Agen Intel: Mengirim laporan untuk sumber:", source);
+
+                // Masukkan ke Supabase
+                const { error } = await _supabase.from('visitor_logs').insert([{
+                    ip_address: userIp,
+                    user_agent: navigator.userAgent,
+                    referrer: document.referrer || 'none',
+                    utm_source: source
+                }]);
+
+                if (error) {
+                    console.error("Agen Intel: Laporan ditolak Supabase!", error.message);
+                } else {
+                    console.log("Agen Intel: Laporan BERHASIL masuk ke Cloud!");
+                }
+            } catch (err) {
+                console.error("Agen Intel: Error Fatal!", err);
+            }
+        }
+        function toggleFAQ(element) {
+            const answer = element.querySelector('.faq-a');
+            const isVisible = answer.style.display === 'block';
+            document.querySelectorAll('.faq-a').forEach(a => a.style.display = 'none');
+            if (!isVisible) answer.style.display = 'block';
+        }
+
+        document.getElementById('claim-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nama = document.getElementById('nama-sekolah').value;
+            const wa = document.getElementById('wa-user').value;
+            const jmlGuru = document.getElementById('jumlah-guru').value; // Ambil nilai jumlah guru
+            const phoneAdmin = "6281911009370";
+
+            const text = encodeURIComponent(`*PENDAFTARAN EDUTRACK BARU*\nInstitusi: ${nama}\nWA: ${wa}\nJumlah Guru: ${jmlGuru}`);
+
+            document.getElementById('res-nama').innerText = nama;
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('success-msg').style.display = 'block';
+
+            registerSekolah(nama, wa, jmlGuru); // Jalankan fungsi register dengan 3 parameter
+
+            setTimeout(() => { window.open(`https://wa.me/${phoneAdmin}?text=${text}`, '_blank'); }, 2000);
+        });
+
+        async function registerSekolah(nama, wa, jmlGuru) {
+            const slug = nama.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+            const { data: existing } = await _supabase.from('schools').select('id').eq('slug', slug).maybeSingle();
+            if (existing) return;
+
+            await _supabase.from('schools').insert([{
+                slug: slug,
+                name: nama,
+                teacher_count: parseInt(jmlGuru), // Masukkan jumlah guru ke DB
+                flag: 'R', // <--- OTOMATIS JADI REAL
+                joined_date: new Date().toISOString().split('T')[0],
+                license_status: 'trial',
+                delete_password: 'admin' + Math.floor(1000 + Math.random() * 9000)
+            }]);
+            fetchClientLogos(); // Update slider setelah daftar
+        }
+    </script>
+</body>
+
+</html>
