@@ -279,6 +279,41 @@
                 placeholder="🔍 Cari Nama Siswa di Riwayat..." class="input-style">
         </div>
 
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button onclick="openPrintDialog()" 
+                style="flex: 1; background:var(--info); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
+                <i class="fas fa-file-pdf"></i> CETAK LAPORAN
+            </button>
+        </div>
+
+        <div id="print-dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 400px; width: 90%;">
+                <h3 style="margin-top: 0;">Pilih Jenis Laporan</h3>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; gap: 10px; margin-bottom: 10px; cursor: pointer;">
+                        <input type="radio" name="print-type" value="all" checked> <span>Laporan Semua Siswa (ALL)</span>
+                    </label>
+                    <label style="display: flex; gap: 10px; cursor: pointer;">
+                        <input type="radio" name="print-type" value="single"> <span>Laporan Per Siswa</span>
+                    </label>
+                </div>
+
+                <div id="student-select-container" style="display: none; margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Pilih Nama Siswa:</label>
+                    <select id="student-dropdown" class="input-style">
+                        <option value="">-- Pilih Siswa --</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="closePrintDialog()" 
+                        style="flex: 1; background: #ccc; color: #333; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold;">Batal</button>
+                    <button onclick="generateReport()" 
+                        style="flex: 1; background: var(--success); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold;">Cetak</button>
+                </div>
+            </div>
+        </div>
+
         <div class="table-container">
             <table>
                 <thead>
@@ -504,6 +539,256 @@
             osc.connect(gain); gain.connect(ctx.destination);
             osc.frequency.value = 880; gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
             osc.start(); osc.stop(ctx.currentTime + 0.1);
+        }
+
+        // ===== FUNGSI CETAK LAPORAN =====
+
+        // Buka Dialog Cetak Laporan
+        async function openPrintDialog() {
+            document.getElementById('print-dialog').style.display = 'flex';
+            
+            // Populate student dropdown
+            const students = await getUniqueStudents();
+            const dropdown = document.getElementById('student-dropdown');
+            dropdown.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student;
+                option.textContent = student;
+                dropdown.appendChild(option);
+            });
+
+            // Setup radio button listeners
+            const radios = document.querySelectorAll('input[name="print-type"]');
+            radios.forEach(radio => {
+                radio.onchange = () => {
+                    const container = document.getElementById('student-select-container');
+                    if (radio.value === 'single') {
+                        container.style.display = 'block';
+                    } else {
+                        container.style.display = 'none';
+                    }
+                };
+            });
+        }
+
+        // Tutup Dialog Cetak Laporan
+        function closePrintDialog() {
+            document.getElementById('print-dialog').style.display = 'none';
+        }
+
+        // Ambil Daftar Siswa Unik
+        async function getUniqueStudents() {
+            if (!schoolUUID) return [];
+            const { data: logs, error } = await _supabase.from('attendance_logs').select('student_info')
+                .eq('school_id', schoolUUID);
+            
+            if (error) return [];
+            
+            const uniqueStudents = [...new Set(logs.map(log => log.student_info))].sort();
+            return uniqueStudents;
+        }
+
+        // Generate Laporan
+        async function generateReport() {
+            const printType = document.querySelector('input[name="print-type"]:checked').value;
+            const selectedStudent = document.getElementById('student-dropdown').value;
+
+            if (printType === 'single' && !selectedStudent) {
+                alert('Silakan pilih siswa terlebih dahulu!');
+                return;
+            }
+
+            if (!schoolUUID) return;
+
+            const { data: logs, error } = await _supabase.from('attendance_logs').select('*')
+                .eq('school_id', schoolUUID).order('created_at', { ascending: true });
+
+            if (error) {
+                alert('Gagal mengambil data laporan!');
+                return;
+            }
+
+            // Filter data berdasarkan tipe laporan
+            let filteredLogs = logs;
+            if (printType === 'single') {
+                filteredLogs = logs.filter(log => log.student_info === selectedStudent);
+            }
+
+            // Group dan sort data
+            const groupedData = groupLogsByStudent(filteredLogs);
+
+            // Generate HTML laporan
+            const reportHTML = generateReportHTML(groupedData, printType);
+
+            // Buka di tab baru dan cetak
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(reportHTML);
+            printWindow.document.close();
+
+            // Auto print setelah halaman load
+            printWindow.onload = () => {
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            };
+
+            closePrintDialog();
+        }
+
+        // Group Logs by Student
+        function groupLogsByStudent(logs) {
+            const grouped = {};
+            
+            logs.forEach(log => {
+                if (!grouped[log.student_info]) {
+                    grouped[log.student_info] = [];
+                }
+                grouped[log.student_info].push(log);
+            });
+
+            // Sort setiap student's data berdasarkan tanggal
+            Object.keys(grouped).forEach(student => {
+                grouped[student].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            });
+
+            return grouped;
+        }
+
+        // Generate Report HTML
+        function generateReportHTML(groupedData, printType) {
+            const schoolName = document.getElementById('ui-school-name').innerText;
+            const timestamp = new Date().toLocaleString('id-ID');
+            
+            let tableHTML = '';
+
+            Object.keys(groupedData).sort().forEach(studentName => {
+                const logs = groupedData[studentName];
+                
+                tableHTML += `
+                    <div style="page-break-after: always; margin-bottom: 40px;">
+                        <h2 style="margin: 0 0 10px 0; font-size: 18px; border-bottom: 2px solid #333; padding-bottom: 5px;">
+                            ${studentName}
+                        </h2>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                            <thead>
+                                <tr style="background-color: #f0f0f0; border-bottom: 2px solid #333;">
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Tanggal</th>
+                                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Pertemuan Ke-</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Catatan Jurnal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                logs.forEach((log, index) => {
+                    const date = new Date(log.created_at).toLocaleString('id-ID', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    const note = log.note || '-';
+                    const meetingNum = log.meeting_number || (index + 1);
+
+                    tableHTML += `
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">${date}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${meetingNum}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">${note}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+
+            const html = `
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Laporan Jurnal - ${schoolName}</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 20px;
+                            color: #333;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            border-bottom: 3px solid #333;
+                            padding-bottom: 15px;
+                        }
+                        .header h1 {
+                            margin: 0;
+                            font-size: 24px;
+                        }
+                        .header p {
+                            margin: 5px 0;
+                            font-size: 12px;
+                            color: #666;
+                        }
+                        .report-info {
+                            margin-bottom: 20px;
+                            font-size: 12px;
+                            color: #666;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        th, td {
+                            padding: 12px;
+                            text-align: left;
+                        }
+                        th {
+                            background-color: #f0f0f0;
+                            font-weight: bold;
+                            border: 1px solid #ddd;
+                        }
+                        td {
+                            border: 1px solid #ddd;
+                        }
+                        @media print {
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .no-print {
+                                display: none;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>${schoolName}</h1>
+                        <p>Laporan Jurnal Kehadiran Siswa</p>
+                    </div>
+                    
+                    <div class="report-info">
+                        <p><strong>Jenis Laporan:</strong> ${printType === 'all' ? 'Semua Siswa' : 'Per Siswa'}</p>
+                        <p><strong>Tanggal Cetak:</strong> ${timestamp}</p>
+                    </div>
+
+                    ${tableHTML}
+
+                    <div style="margin-top: 50px; text-align: right; font-size: 12px; color: #666;">
+                        <p>Dicetak pada: ${timestamp}</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            return html;
         }
     </script>
 </body>
